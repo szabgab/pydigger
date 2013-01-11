@@ -14,4 +14,7 @@ SOME PLANNING
 - collect more meta-data in an SQLite database to provide a searchable interface
 
 
+COMMENTS
+In order to find out which token has which token number the mapping can
+be found here: /usr/lib/python2.7/token.py
 
