@@ -1,9 +1,17 @@
 Building an alternative view of the open source applications written in Python
 
 
+HOW TO RUN
+-----------
+Create a JSON file in the conf/ directory similar to the already exising ones
+and run
+$ python bin/parse.py conf/yourfile.json
+
+
+
 
 SOME PLANNING
-
+---------------
 - Have a json file describe the source that needs to be analyzed
   Where to download the files, how to update them
   (e.g. a packaged file having a new version or a git or SVN repository)
@@ -15,6 +23,8 @@ SOME PLANNING
 
 
 COMMENTS
+----------
 In order to find out which token has which token number the mapping can
 be found here: /usr/lib/python2.7/token.py
+Apparently if I type pydoc  tokenize on the command line, I get the list
 

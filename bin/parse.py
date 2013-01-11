@@ -1,16 +1,28 @@
 #!/usr/bin/python
 
-#import tokenize
 from tokenize import *
 import sys
+import json
+
+def process_template(template_file, outfile):
+  fh = open(template_file)
+  template = fh.read()
+  out = open(outfile, 'w')
+  out.write(template)
+  out.close()
+
 
 def process(file):
   print 'Processing ' + file
   fh = open(file)
   g = generate_tokens(fh.readline)
   #print g
-  tree = []
+  data = {}
   for toknum, tokval, tokstart, tokend, tokline in g:
+    if toknum == NAME:
+        if data.get(tokval) == None:
+            data[tokval] = 0
+        data[tokval] += 1
     # 1  NAME  (from, tokenize, import, def, process,...)
     # 4  NEWLINE
 
@@ -23,16 +35,20 @@ def process(file):
     #print tokval
     #if tokval == 'import':
     #    print toknum
-
+  process_template('template/main.tmpl', 'html/index.html')
 
 def main():
 
   if len(sys.argv) == 1:
-    print 'Usage: ' + sys.argv[0] + '  FILENAME.s'
+    print 'Usage: ' + sys.argv[0] + '  conf/name.json'
     exit()
 
-  for i in range(1, len(sys.argv)):
-    process(sys.argv[i])
+  fh = open(sys.argv[1])
+  conf = json.load(fh)
+
+  # delete existing tree?
+  for p in conf["things"]:
+    process(p["file"])
 
 
 main()
