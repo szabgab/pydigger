@@ -1,0 +1,17 @@
+Building an alternative view of the open source applications written in Python
+
+
+
+SOME PLANNING
+
+- Have a json file describe the source that needs to be analyzed
+  Where to download the files, how to update them
+  (e.g. a packaged file having a new version or a git or SVN repository)
+
+- process and analyze the files and create a static display with a few static
+  json files with meta-data
+
+- collect more meta-data in an SQLite database to provide a searchable interface
+
+
+
