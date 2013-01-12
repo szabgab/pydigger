@@ -13,7 +13,7 @@ dest = 'www'
 def process_template(template_file, outfile):
   fh = open(template_file)
   tmpl = TextTemplate(fh.read())
-  stream = tmpl.generate(title='Foo')
+  stream = tmpl.generate(title='Foo', content='hello')
 
   path = os.path.dirname(outfile)
   if not os.path.exists(path):
@@ -28,7 +28,6 @@ def process(file):
   print 'Processing ' + file
   fh = open(file)
   g = generate_tokens(fh.readline)
-  #print g
   data = {}
   for toknum, tokval, tokstart, tokend, tokline in g:
     if toknum == NAME:
