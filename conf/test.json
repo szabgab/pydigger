@@ -1,7 +1,8 @@
 {
-  "things" : [
-     {
-       "file" : "bin/parse.py"
-     }
+  "projects" : [
+    {
+      "name" : "PyDigger",
+      "root" : "."
+    }
   ]
 }

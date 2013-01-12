@@ -24,8 +24,11 @@ def process_template(template_file, outfile, params):
   out.close()
 
 
-def process(file):
-  print 'Processing ' + file
+def process(file, outfile):
+  if file[-3:] != '.py':
+    return
+  print 'Processing {} to {}'.format(file, outfile)
+
   fh = open(file)
   g = generate_tokens(fh.readline)
   data = {}
@@ -51,8 +54,28 @@ def process(file):
   for k in data.keys():
     content += '<li>{} {}</li>\n'.format(k, data[k])
   content += '</ul>\n'
-  process_template('template/main.tmpl', dest + '/index.html',
+  process_template('template/main.tmpl', dest + outfile + '.html',
      {'title' : file, 'content' : content})
+
+def process_dir(args, dirname, fnames):
+
+  print dirname
+  #print fnames
+  start = args["prefix"]
+  # TODO: remove other unwanted names? and do it in a saner way!
+  try:
+    fnames.index('.git')
+    fnames.remove('.git')
+  except Exception:
+    pass
+  for f in fnames:
+    file = os.path.join(dirname, f)
+    if os.path.isfile(file):
+      #print '  ' + f
+      #print args["project_name"]
+      #outfile = os.path.join(args["project_name"], file[start:])
+      outfile = '/' + args["project_name"] + file[start:]
+      process(file, outfile)
 
 def main():
 
@@ -72,8 +95,12 @@ def main():
   shutil.copy('static/robots.txt', dest)
 
   # delete existing tree?
-  for p in conf["things"]:
-    process(p["file"])
+  for p in conf["projects"]:
+    project_name = p["name"]
+    root = p["root"]
+    # Alternatively, if there is no root, but let's say it has a URL then we fetch the file,
+    # unzip and work from there...
+    os.path.walk(root, process_dir, { "project_name" : project_name, "prefix" : len(root) })
 
 main()
 
