@@ -4,13 +4,21 @@ from tokenize import *
 import sys
 import json
 import os
+import shutil
 
 from genshi.template import TextTemplate
+
+dest = 'www'
 
 def process_template(template_file, outfile):
   fh = open(template_file)
   tmpl = TextTemplate(fh.read())
   stream = tmpl.generate(title='Foo')
+
+  path = os.path.dirname(outfile)
+  if not os.path.exists(path):
+    os.makedirs(path)
+
   out = open(outfile, 'w')
   out.write(stream.render())
   out.close()
@@ -39,7 +47,7 @@ def process(file):
     #print tokval
     #if tokval == 'import':
     #    print toknum
-  process_template('template/main.tmpl', 'html/index.html')
+  process_template('template/main.tmpl', dest + '/index.html')
 
 def main():
 
@@ -50,10 +58,17 @@ def main():
   fh = open(sys.argv[1])
   conf = json.load(fh)
 
+  # Create destination directory and copy static files
+  if not os.path.exists(dest):
+    os.makedirs(dest)
+  if os.path.exists(dest + '/bootstrap'):
+    shutil.rmtree(dest + '/bootstrap')
+  shutil.copytree('static/bootstrap', dest + '/bootstrap')
+  shutil.copy('static/robots.txt', dest)
+
   # delete existing tree?
   for p in conf["things"]:
     process(p["file"])
-
 
 main()
 
