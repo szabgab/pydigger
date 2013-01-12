@@ -5,21 +5,12 @@ import sys
 import json
 import os
 
-#from genshi.template import TemplateLoader
 from genshi.template import TextTemplate
 
-#loader = TemplateLoader(
-#    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'),
-#    auto_reload=True
-#)
-
 def process_template(template_file, outfile):
-#  tmpl = loader.load(template_file)
-#  template = tmpl.generate(title='Geddit').render('html', doctype='html')
   fh = open(template_file)
   tmpl = TextTemplate(fh.read())
   stream = tmpl.generate(title='Foo')
-  #print stream
   out = open(outfile, 'w')
   out.write(stream.render())
   out.close()
