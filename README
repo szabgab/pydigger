@@ -1,6 +1,12 @@
 Building an alternative view of the open source applications written in Python
 
 
+PREREQUISITES
+----------------
+export PYTHONPATH=~/python
+easy_install -d ~/python Genshi
+
+
 HOW TO RUN
 -----------
 Create a JSON file in the conf/ directory similar to the already exising ones

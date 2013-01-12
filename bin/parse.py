@@ -3,12 +3,25 @@
 from tokenize import *
 import sys
 import json
+import os
+
+#from genshi.template import TemplateLoader
+from genshi.template import TextTemplate
+
+#loader = TemplateLoader(
+#    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'),
+#    auto_reload=True
+#)
 
 def process_template(template_file, outfile):
+#  tmpl = loader.load(template_file)
+#  template = tmpl.generate(title='Geddit').render('html', doctype='html')
   fh = open(template_file)
-  template = fh.read()
+  tmpl = TextTemplate(fh.read())
+  stream = tmpl.generate(title='Foo')
+  #print stream
   out = open(outfile, 'w')
-  out.write(template)
+  out.write(stream.render())
   out.close()
 
 
@@ -31,7 +44,7 @@ def process(file):
     # 54 NL
 
     # 55 N_TOKENS  (if I understand this is the non-token, that is the number above the largest one in use)
-    print toknum, tokval
+    #print toknum, tokval
     #print tokval
     #if tokval == 'import':
     #    print toknum
