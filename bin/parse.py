@@ -10,10 +10,10 @@ from genshi.template import TextTemplate
 
 dest = 'www'
 
-def process_template(template_file, outfile):
+def process_template(template_file, outfile, params):
   fh = open(template_file)
   tmpl = TextTemplate(fh.read())
-  stream = tmpl.generate(title='Foo', content='hello')
+  stream = tmpl.generate(title=params["title"], content=params["content"])
 
   path = os.path.dirname(outfile)
   if not os.path.exists(path):
@@ -46,7 +46,13 @@ def process(file):
     #print tokval
     #if tokval == 'import':
     #    print toknum
-  process_template('template/main.tmpl', dest + '/index.html')
+  content = '<h1>' + file + '</h1>\n'
+  content += '<ul>\n'
+  for k in data.keys():
+    content += '<li>{} {}</li>\n'.format(k, data[k])
+  content += '</ul>\n'
+  process_template('template/main.tmpl', dest + '/index.html',
+     {'title' : file, 'content' : content})
 
 def main():
 
