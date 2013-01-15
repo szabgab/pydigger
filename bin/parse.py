@@ -9,17 +9,18 @@ import shutil
 from genshi.template import TextTemplate
 
 dest = 'www'
+pages = []
 
-def process_template(template_file, outfile, params):
+def process_template(template_file, outpath, params):
   fh = open(template_file)
   tmpl = TextTemplate(fh.read())
   stream = tmpl.generate(title=params["title"], content=params["content"])
 
-  path = os.path.dirname(outfile)
+  path = os.path.dirname(outpath)
   if not os.path.exists(path):
     os.makedirs(path)
 
-  out = open(outfile, 'w')
+  out = open(outpath, 'w')
   out.write(stream.render())
   out.close()
 
@@ -56,10 +57,11 @@ def process(file, outfile):
   content += '</ul>\n'
   process_template('template/main.tmpl', dest + outfile + '.html',
      {'title' : file, 'content' : content})
+  pages.append({ "file" : outfile + '.html', "name" : file })
 
 def process_dir(args, dirname, fnames):
 
-  print dirname
+  #print 'Dirname: ' + dirname
   #print fnames
   start = args["prefix"]
   # TODO: remove other unwanted names? and do it in a saner way!
@@ -101,6 +103,14 @@ def main():
     # Alternatively, if there is no root, but let's say it has a URL then we fetch the file,
     # unzip and work from there...
     os.path.walk(root, process_dir, { "project_name" : project_name, "prefix" : len(root) })
+    
+  content = '<ul>\n'
+  for p in pages:
+    content += '<li><a href="{}">{}</a></li>\n'.format(p["file"], p["name"])
+  content += '</ul>\n'
 
+  process_template('template/main.tmpl', dest + '/index.html',
+     {'title' : 'PyDigger', 'content' : content})
+    
 main()
 
