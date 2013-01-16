@@ -96,11 +96,11 @@ def process_dir(args, dirname, fnames):
 def main():
   ap = argparse.ArgumentParser(description="Digging Python projects")
   ap.add_argument('conf', help="json configuration file for example conf/name.json")
+  ap.add_argument('--clear', help="clear the destination directory before starting the process", action='store_true')
   args = ap.parse_args()
-
-#  if len(sys.argv) == 1:
-#    print 'Usage: ' + sys.argv[0] + '  conf/name.json'
-#    exit()
+  
+  if args.clear and os.path.exists(dest):
+    shutil.rmtree(dest)
 
   fh = open(args.conf)
   conf = json.load(fh)
