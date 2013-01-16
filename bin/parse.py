@@ -23,7 +23,11 @@ pages = []
 def process_template(template_file, outpath, params):
   fh = open(template_file)
   tmpl = TextTemplate(fh.read())
-  stream = tmpl.generate(title=params["title"], content=params["content"])
+  stream = tmpl.generate(
+    title=params["title"],
+    content=params["content"],
+    project_name=params.get("project_name"),
+    project_dir=params.get("project_dir"))
 
   path = os.path.dirname(outpath)
   if not os.path.exists(path):
@@ -70,7 +74,7 @@ def analyze_file(file):
   content += '</ul>\n'
   return content
 
-def process_file(file, outfile):
+def process_file(project_name, file, outfile):
   logging.info('Processing {} to {}'.format(file, outfile))
 
   content = ''
@@ -86,7 +90,7 @@ def process_file(file, outfile):
   html = hl[1]
   content += '<p>Lexer: {}</p>{}'.format(lexer, html)
   process_template('template/main.tmpl', dest + outfile + '.html',
-     {'title' : file, 'content' : content})
+     {'title' : file, 'content' : content, 'project_name' : project_name, 'project_dir' : project_name})
   pages.append({ "file" : outfile + '.html', "name" : file })
 
 def process_dir(args, dirname, fnames):
@@ -118,7 +122,7 @@ def process_dir(args, dirname, fnames):
       #outfile = os.path.join(args["name"], file[start:])
       outfile = '/' + args["name"] + file[start:]
       try:
-        process_file(file, outfile)
+        process_file(args["name"], file, outfile)
       except Exception as (e):
         logging.warning('Exception while processing "{}" in project {}: {}'.format(file, args["name"], e))
         pass
