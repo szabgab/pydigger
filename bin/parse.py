@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import argparse
+import logging
+logging.basicConfig(filename='process.log',level=logging.DEBUG)
 
 from tokenize import *
 import sys
@@ -36,9 +38,7 @@ def highlight(file):
   code = fh.read()
 
   guessed_lexer = pygments.lexers.guess_lexer(code)
-  #print guessed_lexer
-  #print pygments.lex(code, pygments.lexers.CLexer())
-  #html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
+  logging.debug("File {} Guessed Lexer {}".format(file, guessed_lexer))
   html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
   return (guessed_lexer, html)
   
@@ -71,7 +71,8 @@ def analyze_file(file):
   return content
 
 def process_file(file, outfile):
-  print 'Processing {} to {}'.format(file, outfile)
+  logging.info('Processing {} to {}'.format(file, outfile))
+
   content = ''
   if file[-3:] == '.py':
     pass
@@ -119,7 +120,7 @@ def process_dir(args, dirname, fnames):
       try:
         process_file(file, outfile)
       except Exception as (e):
-        print e
+        logging.warning('Exception while processing "{}" in project {}: {}'.format(file, args["name"], e))
         pass
 
 def read_arguments():
@@ -130,6 +131,7 @@ def read_arguments():
   return args
 
 def main():
+  logging.info('Started')
   args = read_arguments()
   
   if args.clear and os.path.exists(dest):
