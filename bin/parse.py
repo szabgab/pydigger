@@ -31,15 +31,15 @@ def process_template(template_file, outpath, params):
   out.close()
 
 def highlight(file):
-  #fh = open(file)
-  #code = fh.readall
-  code = "a = 42"
+  fh = open(file)
+  code = fh.read()
 
-  #print pygments.lexers.guess_lexer(code)
+  print pygments.lexers.guess_lexer(code)
   #print pygments.lex(code, pygments.lexers.CLexer())
   html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
+  return html
 
-def process(file, outfile):
+def process_file(file, outfile):
   if file[-3:] != '.py':
     return
   print 'Processing {} to {}'.format(file, outfile)
@@ -69,6 +69,7 @@ def process(file, outfile):
   for k in data.keys():
     content += '<li>{} {}</li>\n'.format(k, data[k])
   content += '</ul>\n'
+  content = highlight(file)
   process_template('template/main.tmpl', dest + outfile + '.html',
      {'title' : file, 'content' : content})
   pages.append({ "file" : outfile + '.html', "name" : file })
@@ -91,7 +92,7 @@ def process_dir(args, dirname, fnames):
       #print args["project_name"]
       #outfile = os.path.join(args["project_name"], file[start:])
       outfile = '/' + args["project_name"] + file[start:]
-      process(file, outfile)
+      process_file(file, outfile)
 
 def main():
   ap = argparse.ArgumentParser(description="Digging Python projects")
@@ -111,7 +112,9 @@ def main():
   if os.path.exists(dest + '/bootstrap'):
     shutil.rmtree(dest + '/bootstrap')
   shutil.copytree('static/bootstrap', dest + '/bootstrap')
+  # TODO all the files
   shutil.copy('static/robots.txt', dest)
+  shutil.copy('static/pygments.css', dest)
 
   # delete existing tree?
   for p in conf["projects"]:

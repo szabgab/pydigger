@@ -34,3 +34,11 @@ In order to find out which token has which token number the mapping can
 be found here: /usr/lib/python2.7/token.py
 Apparently if I type pydoc  tokenize on the command line, I get the list
 
+
+TODO
+-------
+*) Syntax highlight the python files
+*) Parse other, non-python files as well and show them in some nice way
+*) Each project should have its own directory
+*) Each projects needs a main page listing all the files in it
+*) The main page will have a listing of all the projects (for now) with links to the main page of each project
