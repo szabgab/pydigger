@@ -125,10 +125,20 @@ def main():
     # Alternatively, if there is no root, but let's say it has a URL then we fetch the file,
     # unzip and work from there...
     os.path.walk(root, process_dir, { "project_name" : project_name, "prefix" : len(root) })
+
+    # add project index file listing all the files in the project
+    content = '<ul>\n'
+    for p in pages:
+      content += '<li><a href="{}">{}</a></li>\n'.format(p["file"], p["name"])
+    content += '</ul>\n'
+
+    process_template('template/main.tmpl', dest + '/' + project_name + '/index.html',
+       {'title' : 'PyDigger', 'content' : content})
+    
     
   content = '<ul>\n'
-  for p in pages:
-    content += '<li><a href="{}">{}</a></li>\n'.format(p["file"], p["name"])
+  for p in conf["projects"]:
+    content += '<li><a href="{}">{}</a></li>\n'.format(p["name"], p["name"])
   content += '</ul>\n'
 
   process_template('template/main.tmpl', dest + '/index.html',
