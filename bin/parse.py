@@ -7,6 +7,7 @@ import sys
 import json
 import os
 import shutil
+import re
 
 import pygments
 import pygments.lexers
@@ -35,11 +36,11 @@ def highlight(file):
   code = fh.read()
 
   guessed_lexer = pygments.lexers.guess_lexer(code)
-  print guessed_lexer
+  #print guessed_lexer
   #print pygments.lex(code, pygments.lexers.CLexer())
   #html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
   html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
-  return html
+  return (guessed_lexer, html)
 
 def process_file(file, outfile):
   if file[-3:] != '.py':
@@ -71,7 +72,10 @@ def process_file(file, outfile):
   for k in data.keys():
     content += '<li>{} {}</li>\n'.format(k, data[k])
   content += '</ul>\n'
-  content = highlight(file)
+  hl = highlight(file)
+  lexer = re.sub(r'[<>]', '', str(hl[0]))
+  html = hl[1]
+  content = '<p>Lexer: {}</p>{}'.format(lexer, html)
   process_template('template/main.tmpl', dest + outfile + '.html',
      {'title' : file, 'content' : content})
   pages.append({ "file" : outfile + '.html', "name" : file })
@@ -96,11 +100,15 @@ def process_dir(args, dirname, fnames):
       outfile = '/' + args["project_name"] + file[start:]
       process_file(file, outfile)
 
-def main():
+def read_arguments():
   ap = argparse.ArgumentParser(description="Digging Python projects")
   ap.add_argument('conf', help="json configuration file for example conf/name.json")
   ap.add_argument('--clear', help="clear the destination directory before starting the process", action='store_true')
   args = ap.parse_args()
+  return args
+
+def main():
+  args = read_arguments()
   
   if args.clear and os.path.exists(dest):
     shutil.rmtree(dest)
