@@ -41,12 +41,8 @@ def highlight(file):
   #html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
   html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
   return (guessed_lexer, html)
-
-def process_file(file, outfile):
-  if file[-3:] != '.py':
-    return
-  print 'Processing {} to {}'.format(file, outfile)
-
+  
+def analyze_file(file):
   fh = open(file)
   g = generate_tokens(fh.readline)
   data = {}
@@ -72,10 +68,20 @@ def process_file(file, outfile):
   for k in data.keys():
     content += '<li>{} {}</li>\n'.format(k, data[k])
   content += '</ul>\n'
+  return content
+
+def process_file(file, outfile):
+  if file[-3:] != '.py':
+    return
+  print 'Processing {} to {}'.format(file, outfile)
+
+  #content = analyze_file(file)
+  content = ''
+
   hl = highlight(file)
   lexer = re.sub(r'[<>]', '', str(hl[0]))
   html = hl[1]
-  content = '<p>Lexer: {}</p>{}'.format(lexer, html)
+  content += '<p>Lexer: {}</p>{}'.format(lexer, html)
   process_template('template/main.tmpl', dest + outfile + '.html',
      {'title' : file, 'content' : content})
   pages.append({ "file" : outfile + '.html', "name" : file })
