@@ -1,10 +1,16 @@
 #!/usr/bin/python
 
+import argparse
+
 from tokenize import *
 import sys
 import json
 import os
 import shutil
+
+import pygments
+import pygments.lexers
+import pygments.formatters
 
 from genshi.template import TextTemplate
 
@@ -24,6 +30,14 @@ def process_template(template_file, outpath, params):
   out.write(stream.render())
   out.close()
 
+def highlight(file):
+  #fh = open(file)
+  #code = fh.readall
+  code = "a = 42"
+
+  #print pygments.lexers.guess_lexer(code)
+  #print pygments.lex(code, pygments.lexers.CLexer())
+  html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
 
 def process(file, outfile):
   if file[-3:] != '.py':
@@ -80,12 +94,15 @@ def process_dir(args, dirname, fnames):
       process(file, outfile)
 
 def main():
+  ap = argparse.ArgumentParser(description="Digging Python projects")
+  ap.add_argument('conf', help="json configuration file for example conf/name.json")
+  args = ap.parse_args()
 
-  if len(sys.argv) == 1:
-    print 'Usage: ' + sys.argv[0] + '  conf/name.json'
-    exit()
+#  if len(sys.argv) == 1:
+#    print 'Usage: ' + sys.argv[0] + '  conf/name.json'
+#    exit()
 
-  fh = open(sys.argv[1])
+  fh = open(args.conf)
   conf = json.load(fh)
 
   # Create destination directory and copy static files
