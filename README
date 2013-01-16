@@ -36,6 +36,7 @@ DESCRIPTION
 *) The main page has a listing of all the projects (for now) with links to the main page of each project
 *) Parse other, non-python files as well and show them in some nice way
 *) Allow listing directories that need to be excluded from the display
+*) Has simple about page
 
 COMMENTS
 ----------
@@ -45,7 +46,6 @@ Apparently if I type pydoc  tokenize on the command line, I get the list
 
 TODO
 -------
-*) About page
 *) Add logging to the parser
 *) Navigation link from each file back to the project page
 *) Create a configuration file to process several projects, including the source code of Python itself.

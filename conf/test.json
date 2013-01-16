@@ -3,7 +3,7 @@
     {
       "name" : "PyDigger",
       "root" : ".",
-      "exclude dirs": [ "www" ]
+      "exclude dirs": [ "www", "static" ]
     }
   ]
 }

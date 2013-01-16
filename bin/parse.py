@@ -173,6 +173,15 @@ def main():
 
   process_template('template/main.tmpl', dest + '/index.html',
      {'title' : 'PyDigger', 'content' : content})
-    
+
+  about = '''
+  Created by <a href="http://szabgab.com/">Gabor Szabo</a>
+  <p>
+  Source code on <a href="http://github.com/szabgab/pydigger/">Github</a>.
+  </p>
+  '''
+  process_template('template/main.tmpl', dest + '/about.html',
+     {'title' : 'About PyDigger', 'content': about})
+     
 main()
 
