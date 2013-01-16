@@ -2,7 +2,8 @@
   "projects" : [
     {
       "name" : "PyDigger",
-      "root" : "."
+      "root" : ".",
+      "exclude dirs": [ "www" ]
     }
   ]
 }

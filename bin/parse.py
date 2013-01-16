@@ -71,12 +71,14 @@ def analyze_file(file):
   return content
 
 def process_file(file, outfile):
-  if file[-3:] != '.py':
-    return
   print 'Processing {} to {}'.format(file, outfile)
-
-  #content = analyze_file(file)
   content = ''
+  if file[-3:] == '.py':
+    pass
+    #content = analyze_file(file)
+
+  if file[-4:] == '.png':
+    return;
 
   hl = highlight(file)
   lexer = re.sub(r'[<>]', '', str(hl[0]))
@@ -90,21 +92,35 @@ def process_dir(args, dirname, fnames):
 
   #print 'Dirname: ' + dirname
   #print fnames
-  start = args["prefix"]
+  start = len(args["root"])
   # TODO: remove other unwanted names? and do it in a saner way!
   try:
     fnames.index('.git')
     fnames.remove('.git')
   except Exception:
     pass
+
+  exclude_dirs = args.get("exclude dirs")
+  if exclude_dirs != None:
+    for dir in exclude_dirs:
+      try:
+        fnames.index(dir)
+        fnames.remove(dir)
+      except Exception:
+        pass
+
   for f in fnames:
     file = os.path.join(dirname, f)
     if os.path.isfile(file):
       #print '  ' + f
-      #print args["project_name"]
-      #outfile = os.path.join(args["project_name"], file[start:])
-      outfile = '/' + args["project_name"] + file[start:]
-      process_file(file, outfile)
+      #print args["name"]
+      #outfile = os.path.join(args["name"], file[start:])
+      outfile = '/' + args["name"] + file[start:]
+      try:
+        process_file(file, outfile)
+      except Exception as (e):
+        print e
+        pass
 
 def read_arguments():
   ap = argparse.ArgumentParser(description="Digging Python projects")
@@ -138,7 +154,7 @@ def main():
     root = p["root"]
     # Alternatively, if there is no root, but let's say it has a URL then we fetch the file,
     # unzip and work from there...
-    os.path.walk(root, process_dir, { "project_name" : project_name, "prefix" : len(root) })
+    os.path.walk(root, process_dir, p) #{ "project_name" : project_name, "prefix" : len(root) })
 
     # add project index file listing all the files in the project
     content = '<ul>\n'
