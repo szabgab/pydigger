@@ -34,9 +34,11 @@ def highlight(file):
   fh = open(file)
   code = fh.read()
 
-  print pygments.lexers.guess_lexer(code)
+  guessed_lexer = pygments.lexers.guess_lexer(code)
+  print guessed_lexer
   #print pygments.lex(code, pygments.lexers.CLexer())
-  html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
+  #html = pygments.highlight(code, pygments.lexers.CLexer(), pygments.formatters.html.HtmlFormatter())
+  html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
   return html
 
 def process_file(file, outfile):
