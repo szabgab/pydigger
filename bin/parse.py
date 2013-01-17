@@ -134,15 +134,10 @@ def read_arguments():
   args = ap.parse_args()
   return args
 
-def main():
-  logging.info('Started')
-  args = read_arguments()
-  
+def prepare_tree(args):  
   if args.clear and os.path.exists(dest):
     shutil.rmtree(dest)
 
-  fh = open(args.conf)
-  conf = json.load(fh)
 
   # Create destination directory and copy static files
   if not os.path.exists(dest):
@@ -153,6 +148,15 @@ def main():
   # TODO all the files
   shutil.copy('static/robots.txt', dest)
   shutil.copy('static/pygments.css', dest)
+
+def main():
+  logging.info('Started')
+  args = read_arguments()
+
+  prepare_tree(args)
+  
+  fh = open(args.conf)
+  conf = json.load(fh)
 
   # delete existing tree?
   for p in conf["projects"]:
