@@ -2,8 +2,6 @@
 
 import argparse
 import logging
-logging.basicConfig(filename='process.log',level=logging.DEBUG)
-
 from tokenize import *
 import sys
 import json
@@ -17,6 +15,10 @@ import pygments.formatters
 
 from genshi.template import TextTemplate
 
+logdir = 'logs'
+if not os.path.exists(logdir):
+  os.makedirs(logdir)
+logging.basicConfig(filename= logdir + '/process.log', level= logging.DEBUG)
 dest = 'www'
 pages = []
 
