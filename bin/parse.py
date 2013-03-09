@@ -173,7 +173,8 @@ def prepare_tree(args):
   shutil.copy('static/pygments.css', dest)
 
 def main():
-  logging.info('Started')
+  start_time = time.time()
+  logging.info('Started at {}'.format(start_time))
   args = read_arguments()
 
   prepare_tree(args)
@@ -212,9 +213,18 @@ def main():
   <p>
   Source code on <a href="http://github.com/szabgab/pydigger/">Github</a>.
   </p>
+  <p>
+  This is an experimental project. Far from being ready.
+  </p>
   '''
   process_template('template/main.tmpl', dest + '/about.html',
      {'title' : 'About PyDigger', 'content': about})
+
+  end_time = time.time()
+  logging.info('Ended at {}'.format(end_time))
+  logging.info('Total elapsed time: {}'.format(end_time-start_time))
+  logging.info('-----------------------------')
+
 
 main()
 
