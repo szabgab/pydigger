@@ -197,8 +197,8 @@ def main():
 
     process_template('template/main.tmpl', dest + '/' + project_name + '/index.html',
        {'title' : 'PyDigger', 'content' : content})
-    
-    
+
+
   content = '<ul>\n'
   for p in conf["projects"]:
     content += '<li><a href="{}">{}</a></li>\n'.format(p["name"], p["name"])
@@ -215,6 +215,6 @@ def main():
   '''
   process_template('template/main.tmpl', dest + '/about.html',
      {'title' : 'About PyDigger', 'content': about})
-     
+
 main()
 
