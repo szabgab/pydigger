@@ -10,6 +10,7 @@ import shutil
 import re
 import signal
 import time
+from datetime import datetime
 
 import pygments
 import pygments.lexers
@@ -20,7 +21,8 @@ from genshi.template import TextTemplate
 logdir = 'log'
 if not os.path.exists(logdir):
   os.makedirs(logdir)
-logging.basicConfig(filename= logdir + '/process.log', level= logging.DEBUG)
+logfile_name = '{}/process-{}.log'.format(logdir, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
+logging.basicConfig(filename= logfile_name, level= logging.DEBUG)
 dest = 'www'
 pages = []
 
