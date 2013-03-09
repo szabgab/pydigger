@@ -39,6 +39,7 @@ DESCRIPTION
 *) Has simple about page
 *) Basic logging in the parser
 *) Navigation link from each file back to the project page
+*) Timeout for procssing files
 
 COMMENTS
 ----------
@@ -48,6 +49,7 @@ Apparently if I type pydoc  tokenize on the command line, I get the list
 
 TODO
 -------
+*) Guessing the lexer better
 *) Each directory in the project tree has an index file listing all the files and subdirectories in it
 *) Create a configuration file to process several projects, including the source code of Python itself.
 *) List the dependencies and link to the relevant project pages

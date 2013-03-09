@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import re
+import signal
 import time
 
 import pygments
@@ -40,15 +41,31 @@ def process_template(template_file, outpath, params):
   out.write(stream.render())
   out.close()
 
+class TimeoutException(Exception):
+    pass
+
+def timeout_handler(signum, frame):
+  raise TimeoutException();
+
 def highlight(file):
   fh = open(file)
   code = fh.read()
 
   guessed_lexer = pygments.lexers.guess_lexer(code)
   logging.debug("File {} Guessed Lexer {}".format(file, guessed_lexer))
+  timeout = 10
+
   start = time.time()
-  html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
+  signal.signal(signal.SIGALRM, timeout_handler)
+  signal.alarm(timeout)
+  try:
+    html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
+  except TimeoutException:
+    html = 'Timeout'
+    logging.error('Timeout')
+
   end   = time.time()
+
   logging.debug("DONE. Ellapsed time: {}".format(end - start))
   return (guessed_lexer, html)
 
