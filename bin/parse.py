@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-logging.basicConfig(filename='process.log',level=logging.DEBUG)
+logging.basicConfig(filename='log/process.log',level=logging.DEBUG)
 
 from tokenize import *
 import sys
