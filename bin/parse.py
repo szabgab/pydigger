@@ -114,9 +114,10 @@ def process_file(project_name, file, outfile):
   lexer = re.sub(r'[<>]', '', str(hl[0]))
   html = hl[1]
   content += '<p>Lexer: {}</p>{}'.format(lexer, html)
-  process_template('template/main.tmpl', dest + outfile + '.html',
+  #outfile = outfile + '.html'
+  process_template('template/main.tmpl', dest + outfile,
      {'title' : file, 'content' : content, 'project_name' : project_name, 'project_dir' : project_name})
-  pages.append({ "file" : outfile + '.html', "name" : file })
+  pages.append({ "file" : outfile, "name" : file })
 
 def process_dir(args, dirname, fnames):
 
