@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import re
+import time
 
 import pygments
 import pygments.lexers
@@ -43,9 +44,12 @@ def highlight(file):
 
   guessed_lexer = pygments.lexers.guess_lexer(code)
   logging.debug("File {} Guessed Lexer {}".format(file, guessed_lexer))
+  start = time.time()
   html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
+  end   = time.time()
+  logging.debug("DONE. Ellapsed time: {}".format(end - start))
   return (guessed_lexer, html)
-  
+
 def analyze_file(file):
   fh = open(file)
   g = generate_tokens(fh.readline)
@@ -137,7 +141,7 @@ def read_arguments():
 def main():
   logging.info('Started')
   args = read_arguments()
-  
+
   if args.clear and os.path.exists(dest):
     shutil.rmtree(dest)
 
