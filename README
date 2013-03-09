@@ -48,6 +48,7 @@ Apparently if I type pydoc  tokenize on the command line, I get the list
 
 TODO
 -------
+*) Each directory in the project tree has an index file listing all the files and subdirectories in it
 *) Create a configuration file to process several projects, including the source code of Python itself.
 *) List the dependencies and link to the relevant project pages
 *) Show the documentation of each file/project as a separate HTML page
