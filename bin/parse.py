@@ -54,14 +54,30 @@ def highlight(file):
   code = fh.read()
 
   guessed_lexer = pygments.lexers.guess_lexer(code)
-  logging.debug("File {} Guessed Lexer {}".format(file, guessed_lexer))
-  timeout = 10
+  used_lexer = guessed_lexer
+  if file[-3:] == '.py':
+    used_lexer = pygments.lexers.PythonLexer()
+  logging.debug("File {} Guessed Lexer: {} Used Lexer: {}".format(file, guessed_lexer, used_lexer))
 
+
+  # Some lexers:
+  # pygments.lexers.HaxeLexer
+  # pygments.lexers.PerlLexer
+  # pygments.lexers.PythonLexer
+  # pygments.lexers.VelocityXmlLexer
+  # pygments.lexers.RstLexer
+  # pygments.lexers.GroffLexer
+  # pygments.lexers.SourcesListLexer
+  # pygments.lexers.XmlLexer
+  # pygments.lexers.PrologLexer
+
+
+  timeout = 10
   start = time.time()
   signal.signal(signal.SIGALRM, timeout_handler)
   signal.alarm(timeout)
   try:
-    html = pygments.highlight(code, guessed_lexer, pygments.formatters.html.HtmlFormatter())
+    html = pygments.highlight(code, used_lexer, pygments.formatters.html.HtmlFormatter())
   except TimeoutException:
     html = 'Timeout'
     logging.error('Timeout')
@@ -69,7 +85,7 @@ def highlight(file):
   end   = time.time()
 
   logging.debug("DONE. Ellapsed time: {}".format(end - start))
-  return (guessed_lexer, html)
+  return (guessed_lexer, used_lexer, html)
 
 def analyze_file(file):
   fh = open(file)
@@ -111,9 +127,10 @@ def process_file(project_name, file, outfile):
     return;
 
   hl = highlight(file)
-  lexer = re.sub(r'[<>]', '', str(hl[0]))
-  html = hl[1]
-  content += '<p>Lexer: {}</p>{}'.format(lexer, html)
+  guessed_lexer = re.sub(r'[<>]', '', str(hl[0]))
+  used_lexer    = re.sub(r'[<>]', '', str(hl[1]))
+  html          = hl[2]
+  content += '<p>Guessed Lexer: {}  Used Lexer: {}</p>{}'.format(guessed_lexer, used_lexer, html)
   #outfile = outfile + '.html'
   process_template('template/main.tmpl', dest + outfile,
      {'title' : file, 'content' : content, 'project_name' : project_name, 'project_dir' : project_name})
