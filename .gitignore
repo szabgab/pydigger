@@ -1,4 +1,8 @@
 *.swp
+*.pyc
 www/
 log/
 venv/
+build/
+dist/
+pydigger.egg-info/
