@@ -58,7 +58,7 @@ class PyDigger(object):
 			self.data['zip_url']     = package_info['releases'][version][0]['url']
 			self.data['upload_time'] = package_info['releases'][version][0]['upload_time']
 		except:
-			print("LOG: zip_url missing from json for package {} version {}".format(self.data['package'], self.data['version']))
+			print("LOG: zip_url missing from json for package {} version {} try this url: {}".format(self.data['package'], self.data['version'], url))
 			return False
 	
 		self.data['status']  = 'zip_url_found'
