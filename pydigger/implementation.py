@@ -149,4 +149,3 @@ class PyDigger(object):
 			if not self.download_zip_file():
 				continue
 
-	
