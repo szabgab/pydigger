@@ -1,12 +1,15 @@
-from bottle import Bottle, template
+from bottle import Bottle, template, TEMPLATE_PATH
 from pymongo import MongoClient
-import sys
+import os,sys
 
 mongo_client = MongoClient('localhost', 27017)
 mongo_db = mongo_client.pydigger
 packages = mongo_db.packages
 
 app = Bottle()
+
+
+TEMPLATE_PATH.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/views' )
 
 @app.route('/')
 def index():
