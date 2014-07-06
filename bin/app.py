@@ -1,4 +1,4 @@
-from bottle import Bottle, template, TEMPLATE_PATH
+from bottle import Bottle, template, abort, TEMPLATE_PATH
 from pymongo import MongoClient
 import os,sys
 
@@ -15,9 +15,17 @@ TEMPLATE_PATH.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))
 def index():
 	return template('list.tpl', pkgs=packages.find())
 
-@app.route('/hello/<name>')
+@app.route('/package/<name>')
 def hello(name):
-	return template('<b>Hello {{name}}</b>!', name=name)
+	pkgs = []
+	for p in packages.find({'package' : name}):
+		pkgs.append(p)
+
+	if len(pkgs) > 0:
+		return template('package.tpl', name=name, pkgs=pkgs, title=name)
+	else:
+		return abort(404, 'No such package found')
+
 
 @app.route('/about')
 def about():
