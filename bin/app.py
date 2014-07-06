@@ -26,6 +26,11 @@ def hello(name):
 	else:
 		return abort(404, 'No such package found')
 
+@app.route('/stats')
+def stats():
+	pkg_count=packages.find().count()
+	return template('stats.tpl', pkg_count=pkg_count)
+
 
 @app.route('/about')
 def about():
