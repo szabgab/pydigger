@@ -29,7 +29,7 @@ def run():
 		#	print(k)
 		#	print(v[k])
 		#	print('----')
-		v['link']   # http://pypi.python.org/pypi/getvps/0.1
+		#v['link']   # http://pypi.python.org/pypi/getvps/0.1
 		# check if link matches the format we are expecting:
 		# http://pypi.python.org/pypi/<package>/<version>
 		match = re.search(r'http://pypi.python.org/pypi/([^/]+)/([^/]+)$', v['link'])
@@ -41,21 +41,29 @@ def run():
 		version = match.group(2)
 
 		data = packages.find_one({'package' : package, 'version' : version });
-		if data and data['status'] != 'waiting':
-			print("LOG: package {} version {} are already in the database".format(package, version))
-			continue
-
 		if not data:
 			data = {
 				'package' : package,
 				'version' : version,
-				'status'  : 'waiting'
+				'status'  : 'waiting_for_zip_url'
 			}
-			packages.insert(data)
 			print("LOG: adding package {} version {} to the database ".format(package, version))
+			packages.insert(data)
 			data = packages.find_one({'package' : package, 'version' : version });
 
-		#print(data)
+		if not data:
+			print("INERNAL ERROR: data just added and cannot be found? package {} version {}".format(package, version))
+			continue
+
+		#if data and data['status'] != 'waiting':
+		#	print("LOG: package {} version {} are already in the database".format(package, version))
+		#	continue
+
+		# It seems that a package might be already included in the RSS feed even before it was indexed by Pypi
+		# and so it does not yet have the details in the 'releases' and in the 'urls'
+		# we might need to take this in account when processing packages
+		# or maybe if there are multiple version numbers in the 'releases' ?
+
 		if 'zip_url' not in data:
 			url = 'http://pypi.python.org/pypi/{}/{}/json'.format(package, version)
 			w = urllib2.urlopen(url)
@@ -69,19 +77,18 @@ def run():
 				continue
 
 			data['zip_url'] = zip_url
-			print("LOG: saving zip_url {}".format(data['zip_url']))
+			data['status']  = 'zip_url_found'
+			print("LOG: zip_url {} found in json".format(data['zip_url']))
 			packages.save(data)
-
-		# It seems that a package might be already included in the RSS feed even before it was indexed by Pypi
-		# and so it does not yet have the details in the 'releases' and in the 'urls'
-		# we might need to take this in account when processng packages
-		# or maybe if there are multiple version numbers in the 'releases' ?
 
 		# remove the URL from the beginning of the zip_url and add it to the path to 'root'
 		m = re.search(r'^https://pypi.python.org/(.*)', data['zip_url'])
 		if not m:
-			print("ERROR: zi_url prefix does not match {}".format(data['zip_url']))
+			print("ERROR: zip_url prefix does not match {}".format(data['zip_url']))
+			data['status'] = 'error_unknown_zip_url_prefis'
+			packages.save(data)
 			continue
+
 		local_zip_file = root + '/' + m.group(1)
 		local_path = os.path.dirname(local_zip_file);
 		if not os.path.exists(local_zip_file):
