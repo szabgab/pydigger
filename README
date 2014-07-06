@@ -1,5 +1,29 @@
 Building an alternative view of the open source applications written in Python
 
+HOW TO RUN
+-----------
+./bin/pydigger
+
+This will fetch the RSS feed from PyPi, create a subdirectory called www, and download the zip files of the
+most recently uploaded packages.
+
+Once the zip file is downloaded it is unzipped.
+
+
+TODO
+-----
+* Convert the pydigger/ code to use method calls
+* Create a web application that allows the user to see the list of packages alrady included
+  with the date of their release, the list of files, and some meta data.
+* Integrate the coloring of the files
+* See how to run tests
+
+
+
+
+OLDER
+=========
+
 
 PREREQUISITES
 ----------------

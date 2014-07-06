@@ -1,1 +1,1 @@
-from pydigger.implementation import run
+from pydigger.implementation import PyDigger
