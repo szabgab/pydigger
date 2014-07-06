@@ -1,4 +1,4 @@
-from bottle import Bottle
+from bottle import Bottle, template
 from pymongo import MongoClient
 import sys
 
@@ -10,19 +10,15 @@ app = Bottle()
 
 @app.route('/')
 def index():
-	html = '<ul>';
-	for p in packages.find():
-		html += '<li>' + p['package'] + '</li>'
-	html += '</ul>'
-	return html 
+	return template('list.tpl', pkgs=packages.find())
 
 @app.route('/hello/<name>')
 def hello(name):
-	return app.template('<b>Hello {{name}}</b>!', name=name)
+	return template('<b>Hello {{name}}</b>!', name=name)
 
 @app.route('/about')
 def about():
-	return 'PyDigger is being built by <a href="http://szabgab.com/">Gabor Szabo</a>'
+	return template('about.tpl')
 
 if len(sys.argv) > 1 and sys.argv[1] == 'paste':
 	app.run(host='localhost', port=8080, server='paste')
