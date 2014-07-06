@@ -1,6 +1,6 @@
 from __future__ import print_function, division
-import urllib, urllib2, feedparser, re, json, os
 from pymongo import MongoClient
+import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile
 
 #import pkg_resources
 
@@ -62,13 +62,15 @@ def run():
 			json_string = w.read()
 			#print(json_string)
 			package_info = json.loads(json_string)
-			zip_url = package_info['releases'][version][0]['url']
-			if zip_url:
-				data['zip_url'] = zip_url
-				print("LOG: saving zip_url {}".format(data['zip_url']))
-				packages.save(data)
-			else:
+			try:
+				zip_url = package_info['releases'][version][0]['url']
+			except:
 				print("LOG: zip_url missing from json for package {} version {}".format(package, version))
+				continue
+
+			data['zip_url'] = zip_url
+			print("LOG: saving zip_url {}".format(data['zip_url']))
+			packages.save(data)
 
 		# It seems that a package might be already included in the RSS feed even before it was indexed by Pypi
 		# and so it does not yet have the details in the 'releases' and in the 'urls'
@@ -80,23 +82,51 @@ def run():
 		if not m:
 			print("ERROR: zi_url prefix does not match {}".format(data['zip_url']))
 			continue
-		local_path = root + '/' + m.group(1)
-		if not os.path.exists(os.path.dirname(local_path)):
-			print("LOG: creating dir {}".format(os.path.dirname(local_path)))
-			os.makedirs(os.path.dirname(local_path))
-		print("LOG: downloading {} to {}".format(data['zip_url'], local_path))
-		urllib.urlretrieve(data['zip_url'], local_path)
+		local_zip_file = root + '/' + m.group(1)
+		local_path = os.path.dirname(local_zip_file);
+		if not os.path.exists(local_zip_file):
+			if not os.path.exists(local_path):
+				print("LOG: creating dir {}".format(local_path))
+				os.makedirs(local_path)
+			print("LOG: downloading {} to {}".format(data['zip_url'], local_zip_file))
+			urllib.urlretrieve(data['zip_url'], local_zip_file)
 
-		break
+		m = re.search(r'(.*)(\.tar\.gz|\.zip)$', local_zip_file)
+		if m:
+			project_path = m.group(1)
+			extension    = m.group(2)
+			if not os.path.exists(project_path):
+				print("LOG: unzipping {} to {} using {}".format(local_zip_file, local_path, extension))
+				if extension == '.tar.gz':
+					tar = tarfile.open(local_zip_file)
+					tar.extractall(path=local_path)
+					tar.close()
+				elif extension == '.zip':
+					tar = zipfile.ZipFile(local_zip_file)
+					tar.extractall(path=local_path)
+					tar.close()
+				else:
+					raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
+		else:
+			print("ERROR: unknown zip file type {}".format(local_zip_file))
+			continue
+
+		# list all the files in the project_path and add it to the database
+		if 'files' not in data:
+			data['files'] = []
+			for dirname, dirnames, filenames in os.walk(project_path):
+				for filename in filenames:
+					file_path = os.path.join(dirname, filename)[len(project_path)+1:]
+					data['files'].append(file_path)
+			packages.save(data)
+
+
 	## fetch the rss feed
 	## list the most recent package names and version numbers
-
 	## fetch the json file of each package
     ## http://pypi.python.org/pypi/<package_name>/<version>/json
-
-	# add information to a database
-
-	# download each package
-	# unzip them
+	## add information to a database
+	## download each package
+	## unzip them
 	# collect information about the package (list of files)
 
