@@ -1,5 +1,6 @@
 from bottle import route, run, template
 from pymongo import MongoClient
+import sys
 
 mongo_client = MongoClient('localhost', 27017)
 mongo_db = mongo_client.pydigger
@@ -22,5 +23,8 @@ def hello(name):
 def about():
 	return 'PyDigger is being built by <a href="http://szabgab.com/">Gabor Szabo</a>'
 
-run(host='localhost', port=8080)
+if len(sys.argv) > 1 and sys.argv[1] == 'paste':
+	run(host='localhost', port=8080, server='paste')
+else:
+	run(host='localhost', port=8080)
 

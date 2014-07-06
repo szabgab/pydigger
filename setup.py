@@ -16,6 +16,7 @@ setup(name='pydigger',
       requires=[
           'urllib2',
           'feedparser',
+          'pymongo',
           #'pkg_resources',
       ],
       tests_require=[
