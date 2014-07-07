@@ -210,6 +210,7 @@ class PyDigger(object):
 
 	# collect information about the package (list of files)
 	def run(self):
+		start = time.time()
 		w = urllib2.urlopen(rss_feed)
 		rss = w.read()
 		feed = feedparser.parse( rss )
@@ -239,4 +240,8 @@ class PyDigger(object):
 
 		last_update['value'] = datetime.datetime.utcnow()
 		self.meta.save(last_update)
+
+		end   = time.time()
+
+		print("LOG: DONE. Elapsed time: {}".format(end - start))
 
