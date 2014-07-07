@@ -71,7 +71,7 @@ class PyDigger(object):
 		return True
 
 	def download_zip_file(self):
-		if self.data['status'] == 'error_unknown_zip_url_prefis':
+		if self.data['status'] == 'error_unknown_zip_url_prefix':
 			return False
 		if self.data['status'] == 'error_unknown_zip_file_type':
 			return False
@@ -80,7 +80,7 @@ class PyDigger(object):
 		m = re.search(r'^https://pypi.python.org/(.*)', self.data['zip_url'])
 		if not m:
 			print("ERROR: zip_url prefix does not match {}".format(self.data['zip_url']))
-			self.data['status'] = 'error_unknown_zip_url_prefis'
+			self.data['status'] = 'error_unknown_zip_url_prefix'
 			self.packages.save(self.data)
 			return False
 	

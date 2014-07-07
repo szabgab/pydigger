@@ -49,7 +49,18 @@ def package(name):
 @app.route('/stats')
 def stats():
 	pkg_count=packages.find().count()
-	return mytemplate('stats.tpl', pkg_count=pkg_count)
+	st = {}
+	statuses = [
+		'waiting_for_zip_url',
+		'error_unknown_zip_file_type',
+		'error_unknown_zip_url_prefis',   # typo in indexer
+		'error_unknown_zip_url_prefix',
+		'zip_url_found'
+	]
+	for s in statuses:
+		st[s] = packages.find({'status' : s}).count()
+
+	return mytemplate('stats.tpl', pkg_count=pkg_count, statuses=st)
 
 
 @app.route('/about')
