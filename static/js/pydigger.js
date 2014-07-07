@@ -25,5 +25,20 @@ $("#diff_with").on('click', function( event ) {
 	alert('not implemented yet');
 	//var url = '/diff?source=
 });
-//console.log('hello PyDigger - end')
 
+var availableTags = [];
+$( "#search" ).autocomplete({
+	source: function( request, response ) {
+		//console.log('search');
+		$.ajax({
+			url: "/search/json?package=" + $("#search").val(),
+			success: function( data ) {
+				//console.log(data.length);
+				response(JSON.parse(data));
+			}
+        });
+	},
+	minLength: 2
+});
+
+//console.log('hello PyDigger - end')

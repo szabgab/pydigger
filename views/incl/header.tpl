@@ -7,7 +7,10 @@
   <title>{{title}}</title>
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/pygments.css" />
+  <link rel="stylesheet" href="/css/jquery-ui.min.css" />
+
   <script src="/js/jquery-1.11.1.min.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
 </head>
 <body>
 <div id="header">
@@ -15,6 +18,7 @@
 | <a href="/about">About</a>
 | <a href="/stats">Stats</a>
 </div>
+<input id="search" />
 
 <div id="page">
 

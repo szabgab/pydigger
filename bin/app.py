@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from bottle import Bottle, template, abort, TEMPLATE_PATH, response, request, redirect
 from pymongo import MongoClient
-import os,sys,re
+import os,sys,re,json
 
 mongo_client = MongoClient('localhost', 27017)
 mongo_db = mongo_client.pydigger
@@ -46,14 +46,22 @@ def source(path):
 
 @app.route('/js/<file>')
 def js(file):
-	return _static(file, 'js', 'application/javascript')
+	return _static(file, 'js')
 
-@app.route('/css/<file>')
+@app.route('/css/<file:path>')
 def css(file):
-	return _static(file, 'css', 'text/css')
+	return _static(file, 'css')
 
-def _static(file, dir, mime):
+def _static(file, dir):
 	path = root + '/static/' + dir + '/' + file
+	if re.search(r'\.css$', file):
+		mime = 'text/css'
+	if re.search(r'\.js$', file):
+		mime = 'application/javascript'	
+	m = re.search(r'\.(png|gif)$', file)
+	if m:
+		mime = 'image/' + m.group(1)
+
 	if os.path.exists(path):
 		response.set_header('Content-type', mime)
 		return open(path).read()
@@ -89,6 +97,24 @@ def package(name, version=''):
 		return mytemplate('package.tpl', name=name, pkgs=pkgs, idx=idx, title=name)
 	else:
 		return abort(404, 'No such package found')
+
+@app.route('/search/json')
+def search_json():
+	q = {}
+	status = request.query.get('status')
+	if status:
+		q['status'] = status
+
+	package = request.query.get('package')
+	if package:
+		q['package'] = re.compile(package, re.IGNORECASE)
+	#return q
+	pkgs = []
+	for p in packages.find(q):
+		pkgs.append(p['package'])
+	#return json.dumps(['abc', 'def'])
+	return json.dumps(pkgs)
+	
 
 @app.route('/search')
 def search():
