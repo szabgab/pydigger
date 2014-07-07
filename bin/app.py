@@ -12,9 +12,12 @@ app = Bottle()
 
 TEMPLATE_PATH.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/views' )
 
+def mytemplate(file, **args):
+	return template(file, **args)
+
 @app.route('/')
 def index():
-	return template('list.tpl', pkgs=packages.find())
+	return mytemplate('list.tpl', pkgs=packages.find())
 
 @app.route('/package/<name>')
 def hello(name):
@@ -23,19 +26,19 @@ def hello(name):
 		pkgs.append(p)
 
 	if len(pkgs) > 0:
-		return template('package.tpl', name=name, pkgs=pkgs, title=name)
+		return mytemplate('package.tpl', name=name, pkgs=pkgs, title=name)
 	else:
 		return abort(404, 'No such package found')
 
 @app.route('/stats')
 def stats():
 	pkg_count=packages.find().count()
-	return template('stats.tpl', pkg_count=pkg_count)
+	return mytemplate('stats.tpl', pkg_count=pkg_count)
 
 
 @app.route('/about')
 def about():
-	return template('about.tpl')
+	return mytemplate('about.tpl')
 
 if len(sys.argv) > 1 and sys.argv[1] == 'paste':
 	app.run(host='localhost', port=8080, server='paste')
