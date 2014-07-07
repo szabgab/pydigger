@@ -13,6 +13,8 @@ app = Bottle()
 TEMPLATE_PATH.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/views' )
 
 def mytemplate(file, **args):
+	last_update = mongo_db.meta.find_one({ 'name' : 'last_update' })
+	args['last_update'] = last_update['value']
 	return template(file, **args)
 
 @app.route('/')
