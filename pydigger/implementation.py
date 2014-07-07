@@ -1,16 +1,16 @@
 from __future__ import print_function, division
 from pymongo import MongoClient
-import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile
+import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, datetime
 
 root = 'www';
 rss_feed = 'https://pypi.python.org/pypi?%3Aaction=rss'
 
 class PyDigger(object):
 	def __init__(self):
-		mongo_client = MongoClient('localhost', 27017)
-		mongo_db = mongo_client.pydigger
-		self.packages = mongo_db.packages
-
+		self.mongo_client = MongoClient('localhost', 27017)
+		self.mongo_db = self.mongo_client.pydigger
+		self.packages = self.mongo_db.packages
+		self.meta     = self.mongo_db.meta
 
 	def find_or_create_pkg_info(self, link):
 		#link   # http://pypi.python.org/pypi/getvps/0.1
@@ -148,4 +148,12 @@ class PyDigger(object):
 	
 			if not self.download_zip_file():
 				continue
+
+		last_update = self.meta.find_one({ 'name' : 'last_update' })
+		if not last_update:
+			self.meta.insert({ 'name' : 'last_update' })
+			last_update = self.meta.find_one({ 'name' : 'last_update' })
+
+		last_update['value'] = datetime.datetime.utcnow()
+		self.meta.save(last_update)
 
