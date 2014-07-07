@@ -1,9 +1,21 @@
 from __future__ import print_function, division
 from pymongo import MongoClient
-import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, datetime
+import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, datetime, time
 
-root = 'www';
+import signal
+import pygments
+import pygments.lexers
+import pygments.formatters
+
+src_root = 'www'
+html_root = 'html'
 rss_feed = 'https://pypi.python.org/pypi?%3Aaction=rss'
+
+class TimeoutException(Exception):
+    pass
+
+def timeout_handler(signum, frame):
+	raise TimeoutException()
 
 class PyDigger(object):
 	def __init__(self):
@@ -24,7 +36,7 @@ class PyDigger(object):
 		package = match.group(1)
 		version = match.group(2)
 	
-		data = self.packages.find_one({'package' : package, 'version' : version });
+		data = self.packages.find_one({'package' : package, 'version' : version })
 		if not data:
 			data = {
 				'package' : package,
@@ -33,7 +45,7 @@ class PyDigger(object):
 			}
 			print("LOG: adding package {} version {} to the database ".format(package, version))
 			self.packages.insert(data)
-			data = self.packages.find_one({'package' : package, 'version' : version });
+			data = self.packages.find_one({'package' : package, 'version' : version })
 	
 		if not data:
 			print("INERNAL ERROR: data just added and cannot be found? package {} version {}".format(package, version))
@@ -76,7 +88,7 @@ class PyDigger(object):
 		if self.data['status'] == 'error_unknown_zip_file_type':
 			return False
 
-		# remove the URL from the beginning of the zip_url and add it to the path to 'root'
+		# remove the URL from the beginning of the zip_url and add it to the path to 'src_root'
 		m = re.search(r'^https://pypi.python.org/(.*)', self.data['zip_url'])
 		if not m:
 			print("ERROR: zip_url prefix does not match {}".format(self.data['zip_url']))
@@ -84,8 +96,8 @@ class PyDigger(object):
 			self.packages.save(self.data)
 			return False
 	
-		local_zip_file = root + '/' + m.group(1)
-		local_path = os.path.dirname(local_zip_file);
+		local_zip_file = src_root + '/' + m.group(1)
+		local_path = os.path.dirname(local_zip_file)
 		if not os.path.exists(local_zip_file):
 			if not os.path.exists(local_path):
 				print("LOG: creating dir {}".format(local_path))
@@ -110,15 +122,15 @@ class PyDigger(object):
 				else:
 					raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
 		else:
-			self.data['status'] = 'error_unknown_zip_file_type';
+			self.data['status'] = 'error_unknown_zip_file_type'
 			print("ERROR: unknown zip file type {}".format(local_zip_file))
 			self.packages.save(self.data)
 			return False
 	
 		# list all the files in the project_path and add it to the database
 		if 'files' not in self.data:
-			self.data['local_path'] = local_path[len(root)+1:]
-			self.data['project_path'] = project_path[len(root)+1:]
+			self.data['local_path'] = local_path[len(src_root)+1:]
+			self.data['project_path'] = project_path[len(src_root)+1:]
 			self.data['files'] = []
 			for dirname, dirnames, filenames in os.walk(project_path):
 				for filename in filenames:
@@ -126,6 +138,67 @@ class PyDigger(object):
 					self.data['files'].append(file_path)
 			self.packages.save(self.data)
 		return True
+
+	def highlight(self, file):
+		# for now only try to process .py files
+		if file[-3:] != '.py':
+			return
+		if 'project_path' not in self.data:
+			return;
+		path = src_root + '/' + self.data['project_path'] + '/' + file
+		out_file = html_root + '/' + self.data['project_path'] + '/' + file
+		out_path = os.path.dirname(out_file)
+		if os.path.exists(out_file):
+			return
+		print("LOG: syntax highlighting {}".format(path))
+
+		fh = open(path)
+		code = fh.read()
+		fh.close()
+
+		guessed_lexer = pygments.lexers.guess_lexer(code)
+		used_lexer = guessed_lexer
+		if file[-3:] == '.py':
+			used_lexer = pygments.lexers.PythonLexer()
+		print("LOG: File {} Guessed Lexer: {} Used Lexer: {}".format(file, guessed_lexer, used_lexer))
+
+
+		# Some lexers:
+		# pygments.lexers.HaxeLexer
+		# pygments.lexers.PerlLexer
+		# pygments.lexers.PythonLexer
+		# pygments.lexers.VelocityXmlLexer
+		# pygments.lexers.RstLexer
+		# pygments.lexers.GroffLexer
+		# pygments.lexers.SourcesListLexer
+		# pygments.lexers.XmlLexer
+		# pygments.lexers.PrologLexer
+
+
+		timeout = 10
+		start = time.time()
+		signal.signal(signal.SIGALRM, timeout_handler)
+		signal.alarm(timeout)
+		try:
+			html = pygments.highlight(code, used_lexer, pygments.formatters.html.HtmlFormatter())
+		except TimeoutException:
+			html = 'Timeout'
+			print('ERROR: Timeout when running syntax highlighting for {}'.format(file))
+		end   = time.time()
+		print("LOG. Syntaxt highlighting {} ellapsed time: {}".format(file, end - start))
+		if not os.path.exists(out_path):
+			os.makedirs(out_path)
+		fh = open(out_file, 'w')
+		fh.write(html.encode('utf8'))
+		fh.close()
+
+		return {
+			'guessed_lexer' : guessed_lexer,
+			'used_lexer'    : used_lexer,
+			'html'          : html
+		}
+
+
 
 	# fetch the rss feed
 	# list the most recent package names and version numbers
@@ -154,6 +227,10 @@ class PyDigger(object):
 	
 			if not self.download_zip_file():
 				continue
+
+			if 'files' in self.data:
+				for f in self.data['files']:
+					self.highlight(f)
 
 		last_update = self.meta.find_one({ 'name' : 'last_update' })
 		if not last_update:

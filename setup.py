@@ -17,6 +17,8 @@ setup(name='pydigger',
           'urllib2',
           'feedparser',
           'pymongo',
+          'pygments',
+          'genshi',
           #'pkg_resources',
       ],
       tests_require=[

@@ -1,6 +1,7 @@
 *.swp
 *.pyc
 www/
+html/
 log/
 venv/
 build/

@@ -1,7 +1,7 @@
 Building an alternative view of the open source applications written in Python
 
-HOW TO RUN
------------
+HOW TO RUN - collecting data
+-----------------------------
 ./bin/pydigger
 
 This will fetch the RSS feed from PyPi, create a subdirectory called www, and download the zip files of the
@@ -9,16 +9,9 @@ most recently uploaded packages.
 
 Once the zip file is downloaded it is unzipped.
 
-
-TODO
------
-* Convert the pydigger/ code to use method calls
-* Create a web application that allows the user to see the list of packages alrady included
-  with the date of their release, the list of files, and some meta data.
-* Integrate the coloring of the files
-* See how to run tests
-
-
+web site
+---------
+./bin/app.py
 
 
 OLDER
@@ -49,9 +42,6 @@ SOME PLANNING
 - process and analyze the files and create a static display with a few static
   json files with meta-data
 
-- collect more meta-data in an SQLite database to provide a searchable interface
-
-
 DESCRIPTION
 ---------------
 *) Syntax highlight the python files
@@ -63,7 +53,7 @@ DESCRIPTION
 *) Has simple about page
 *) Basic logging in the parser
 *) Navigation link from each file back to the project page
-*) Timeout for procssing files
+*) Timeout for processing files
 
 COMMENTS
 ----------
@@ -80,4 +70,3 @@ TODO
 *) List the dependencies and link to the relevant project pages
 *) Show the documentation of each file/project as a separate HTML page
 *) Handle the file we cannot parse and highlight (e.g. .png files)
-*) Mirror PyPi or sit on the RSS feed from PyPi and process the most recently uploaded projects.

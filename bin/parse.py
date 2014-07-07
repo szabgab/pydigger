@@ -23,7 +23,7 @@ if not os.path.exists(logdir):
   os.makedirs(logdir)
 logfile_name = '{}/process-{}.log'.format(logdir, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
 logging.basicConfig(filename= logfile_name, level= logging.DEBUG)
-dest = 'www'
+dest = 'color'
 pages = []
 
 def process_template(template_file, outpath, params):
@@ -117,6 +117,9 @@ def analyze_file(file):
 
 def process_file(project_name, file, outfile):
   logging.info('Processing {} to {}'.format(file, outfile))
+  print(file)
+  if file != './bin/parse.py':
+      return
 
   content = ''
   if file[-3:] == '.py':

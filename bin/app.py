@@ -26,13 +26,31 @@ def source(path):
 	if re.search(r'\.\.', path):
 		return abort(404, 'Invalid request')
 
+	full_path = root + '/html/packages/' + path
+	if os.path.exists(full_path):
+		fh = open(full_path)
+		code = fh.read()
+		fh.close()
+		return mytemplate('page.tpl', code=code)
+	
+	# source version
 	full_path = root + '/www/packages/' + path
 	if not os.path.exists(full_path):
 		return abort(404, 'File not found')
 
 	response.set_header('Content-type', 'text/plain')
 	fh = open(full_path)
-	return fh.read()
+	code = fh.read()
+	fh.close()
+	return code
+
+@app.route('/css/<file>')
+def static(file):
+	path = root + '/static/css/' + file
+	if os.path.exists(path):
+		response.set_header('Content-type', 'text/css')
+		return open(path).read()
+	return abort(404, 'File not found')
 
 @app.route('/package/<name>')
 def package(name):
