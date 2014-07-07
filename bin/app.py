@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from bottle import Bottle, template, abort, TEMPLATE_PATH
 from pymongo import MongoClient
 import os,sys
