@@ -9,8 +9,9 @@
 </head>
 <body>
 <div id="header">
-<a href="/">PyDigger</a> |
-<a href="/about">About</a>
+<a href="/">PyDigger</a>
+| <a href="/about">About</a>
+| <a href="/stats">Stats</a>
 </div>
 
 <div id="page">
