@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from bottle import Bottle, template, abort, TEMPLATE_PATH, response
+from bottle import Bottle, template, abort, TEMPLATE_PATH, response, request
 from pymongo import MongoClient
 import os,sys,re
 
@@ -46,6 +46,13 @@ def package(name):
 	else:
 		return abort(404, 'No such package found')
 
+@app.route('/search')
+def search():
+	q = {}
+	q['status'] = request.query.get('status')
+	#return(q)
+	return mytemplate('list.tpl', pkgs=packages.find(q))
+
 @app.route('/stats')
 def stats():
 	pkg_count=packages.find().count()
@@ -53,7 +60,6 @@ def stats():
 	statuses = [
 		'waiting_for_zip_url',
 		'error_unknown_zip_file_type',
-		'error_unknown_zip_url_prefis',   # typo in indexer
 		'error_unknown_zip_url_prefix',
 		'zip_url_found'
 	]

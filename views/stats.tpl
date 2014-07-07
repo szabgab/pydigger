@@ -3,7 +3,7 @@ Total number of packages {{pkg_count}}<br />
 
 <ul>
 % for s in statuses:
-    <li>{{s}} {{statuses[s]}}</li>
+    <li><a href="/search?status={{s}}">{{s}}</a> {{statuses[s]}}</li>
 % end
 </ul>
 
