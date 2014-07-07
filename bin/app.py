@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from bottle import Bottle, template, abort, TEMPLATE_PATH, response, request
+from bottle import Bottle, template, abort, TEMPLATE_PATH, response, request, redirect
 from pymongo import MongoClient
 import os,sys,re
 
@@ -60,21 +60,32 @@ def _static(file, dir, mime):
 	return abort(404, 'File not found')
 
 @app.get('/package/<name>')
-@app.post('/package/<name>')
-def package(name):
-	try:
-		idx = int(request.forms.get('idx'))
-	except:
-		idx = 0
+@app.get('/package/<name>/<version>')
+def package(name, version=''):
+	idx = 0
+	#try:
+	#	idx = int(request.forms.get('idx'))
+	#except:
+	#	idx = 0
 		#pass
 	#if not idx:
 
 	pkgs = []
 	for p in packages.find({'package' : name}):
 		pkgs.append(p)
+	#sys.stderr.write('count {}\n'.format(len(pkgs)))
 
 	if len(pkgs) > 0:
 		pkgs.sort(reverse=True, key=lambda(f): f['upload_time'] if 'upload_time' in f else 0)
+		if version != '':
+			for i in range(0, len(pkgs)):
+				if pkgs[i]['version'] == version:
+					idx = i
+					break
+			else:
+				return abort(404, 'Version {} not found in package {}'.format(version, name))
+			if idx == 0:
+				redirect('/package/' + name)
 		return mytemplate('package.tpl', name=name, pkgs=pkgs, idx=idx, title=name)
 	else:
 		return abort(404, 'No such package found')

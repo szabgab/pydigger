@@ -4,17 +4,18 @@
 <a href="http://pypi.python.org/pypi/{{name}}/{{pkgs[idx]['version']}}/json">PyPi JSON</a>
 </div>
 
-<form method="POST">
+<input type="hidden" id="package_name" value="{{name}}" />
+
 <select id="version_selector" name="idx">
+  <option value="">Select Verion</option>
 % for i in range(0, len(pkgs)):
-  <option value="{{i}}"
-%     if i==idx:
-         SELECTED="SELECTED"
-%     end
-  >{{pkgs[i]['version']}} at {{pkgs[i]['upload_time'] if 'upload_time' in pkgs[i] else  ''}}</option>
+%   if i != idx:
+       <option value="{{pkgs[i]['version']}}">{{pkgs[i]['version']}} at {{pkgs[i]['upload_time'] if 'upload_time' in pkgs[i] else  ''}}</option>
+%   end
 % end
-</select>
-</form>
+</select><br>
+<button id="jump_to">Jump to</button>
+<!-- <button id="diff_with">Diff with</button> -->
 
 <h2>Files</h2>
 <ul>
