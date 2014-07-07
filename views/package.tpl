@@ -1,20 +1,29 @@
 % include('incl/header.tpl')
-<h2>{{name}}</h2>
-<ul>
-% for p in pkgs:
-  <li>{{p['version']}} on {{p['upload_time'] if 'upload_time' in p else  ''}}  <a href="http://pypi.python.org/pypi/{{p['package']}}/{{p['version']}}/json">PyPi JSON</a></li>
-% end
-</ul>
+<h2>{{name}} {{pkgs[idx]['version']}}</h2>
+<div id="pypi_json_link">
+<a href="http://pypi.python.org/pypi/{{name}}/{{pkgs[idx]['version']}}/json">PyPi JSON</a>
+</div>
 
-<h2>Files of {{pkgs[0]['version']}}</h2>
+<form method="POST">
+<select id="version_selector" name="idx">
+% for i in range(0, len(pkgs)):
+  <option value="{{i}}"
+%     if i==idx:
+         SELECTED="SELECTED"
+%     end
+  >{{pkgs[i]['version']}} at {{pkgs[i]['upload_time'] if 'upload_time' in pkgs[i] else  ''}}</option>
+% end
+</select>
+</form>
+
+<h2>Files</h2>
 <ul>
-% if 'files' in pkgs[0]:
-%     for f in pkgs[0]['files']:
-%         if 'project_path' in pkgs[0]:
-              <li><a href="/{{pkgs[0]['project_path']}}/{{f}}">{{f}}</a></li>
+% if 'files' in pkgs[idx]:
+%     for f in pkgs[idx]['files']:
+%         if 'project_path' in pkgs[idx]:
+              <li><a href="/{{pkgs[idx]['project_path']}}/{{f}}">{{f}}</a></li>
 %         else:
               <li>{{f}}</li>
-
 %         end
 %     end
 % else:

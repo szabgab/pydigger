@@ -59,15 +59,23 @@ def _static(file, dir, mime):
 		return open(path).read()
 	return abort(404, 'File not found')
 
-@app.route('/package/<name>')
+@app.get('/package/<name>')
+@app.post('/package/<name>')
 def package(name):
+	try:
+		idx = int(request.forms.get('idx'))
+	except:
+		idx = 0
+		#pass
+	#if not idx:
+
 	pkgs = []
 	for p in packages.find({'package' : name}):
 		pkgs.append(p)
 
 	if len(pkgs) > 0:
 		pkgs.sort(reverse=True, key=lambda(f): f['upload_time'] if 'upload_time' in f else 0)
-		return mytemplate('package.tpl', name=name, pkgs=pkgs, title=name)
+		return mytemplate('package.tpl', name=name, pkgs=pkgs, idx=idx, title=name)
 	else:
 		return abort(404, 'No such package found')
 
