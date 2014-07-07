@@ -28,6 +28,7 @@ def hello(name):
 		pkgs.append(p)
 
 	if len(pkgs) > 0:
+		pkgs.sort(key=lambda(f): f['upload_time'] if 'upload_time' in f else 0)
 		return mytemplate('package.tpl', name=name, pkgs=pkgs, title=name)
 	else:
 		return abort(404, 'No such package found')
