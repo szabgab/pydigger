@@ -109,11 +109,11 @@ def search_json():
 	if package:
 		q['package'] = re.compile(package, re.IGNORECASE)
 	#return q
-	pkgs = []
+	pkgs = set([]) 
 	for p in packages.find(q):
-		pkgs.append(p['package'])
+		pkgs.add(p['package'])
 	#return json.dumps(['abc', 'def'])
-	return json.dumps(pkgs)
+	return json.dumps(list(pkgs))
 	
 
 @app.route('/search')
