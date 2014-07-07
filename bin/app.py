@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from bottle import Bottle, template, abort, TEMPLATE_PATH
+from bottle import Bottle, template, abort, TEMPLATE_PATH, response
 from pymongo import MongoClient
-import os,sys
+import os,sys,re
 
 mongo_client = MongoClient('localhost', 27017)
 mongo_db = mongo_client.pydigger
@@ -9,8 +9,8 @@ packages = mongo_db.packages
 
 app = Bottle()
 
-
-TEMPLATE_PATH.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/views' )
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_PATH.append( root + '/views' )
 
 def mytemplate(file, **args):
 	last_update = mongo_db.meta.find_one({ 'name' : 'last_update' })
@@ -21,8 +21,21 @@ def mytemplate(file, **args):
 def index():
 	return mytemplate('list.tpl', pkgs=packages.find())
 
+@app.route('/packages/<path:path>')
+def source(path):
+	if re.search(r'\.\.', path):
+		return abort(404, 'Invalid request')
+
+	full_path = root + '/www/packages/' + path
+	if not os.path.exists(full_path):
+		return abort(404, 'File not found')
+
+	response.set_header('Content-type', 'text/plain')
+	fh = open(full_path)
+	return fh.read()
+
 @app.route('/package/<name>')
-def hello(name):
+def package(name):
 	pkgs = []
 	for p in packages.find({'package' : name}):
 		pkgs.append(p)

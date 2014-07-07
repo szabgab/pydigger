@@ -60,6 +60,10 @@ class PyDigger(object):
 		except:
 			print("LOG: zip_url missing from json for package {} version {} try this url: {}".format(self.data['package'], self.data['version'], url))
 			return False
+
+		self.data['package_info'] = {}
+		self.data['package_info']['info'] = package_info['info']
+
 	
 		self.data['status']  = 'zip_url_found'
 		print("LOG: zip_url {} found in json".format(self.data['zip_url']))
@@ -113,6 +117,8 @@ class PyDigger(object):
 	
 		# list all the files in the project_path and add it to the database
 		if 'files' not in self.data:
+			self.data['local_path'] = local_path[len(root)+1:]
+			self.data['project_path'] = project_path[len(root)+1:]
 			self.data['files'] = []
 			for dirname, dirnames, filenames in os.walk(project_path):
 				for filename in filenames:

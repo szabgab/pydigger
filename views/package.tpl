@@ -10,7 +10,12 @@
 <ul>
 % if 'files' in pkgs[0]:
 %     for f in pkgs[0]['files']:
-          <li><a href="/package/">{{f}}</a></li>
+%         if 'project_path' in pkgs[0]:
+              <li><a href="/{{pkgs[0]['project_path']}}/{{f}}">{{f}}</a></li>
+%         else:
+              <li>{{f}}</li>
+
+%         end
 %     end
 % else:
       No files were recorded
