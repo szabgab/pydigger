@@ -46,5 +46,5 @@ def about():
 if len(sys.argv) > 1 and sys.argv[1] == 'paste':
 	app.run(host='localhost', port=8080, server='paste')
 else:
-	app.run(host='localhost', port=8080)
+	app.run(host='localhost', port=8080, reloader=True, debug=True)
 
