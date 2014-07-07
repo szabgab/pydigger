@@ -2,7 +2,7 @@
 <h2>{{name}}</h2>
 <ul>
 % for p in pkgs:
-  <li>{{p['version']}}</li>
+  <li>{{p['version']}} on {{p['upload_time'] if 'upload_time' in p else  ''}}  <a href="http://pypi.python.org/pypi/{{p['package']}}/{{p['version']}}/json">PyPi JSON</a></li>
 % end
 </ul>
 
