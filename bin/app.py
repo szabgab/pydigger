@@ -44,11 +44,18 @@ def source(path):
 	fh.close()
 	return code
 
+@app.route('/js/<file>')
+def js(file):
+	return _static(file, 'js', 'application/javascript')
+
 @app.route('/css/<file>')
-def static(file):
-	path = root + '/static/css/' + file
+def css(file):
+	return _static(file, 'css', 'text/css')
+
+def _static(file, dir, mime):
+	path = root + '/static/' + dir + '/' + file
 	if os.path.exists(path):
-		response.set_header('Content-type', 'text/css')
+		response.set_header('Content-type', mime)
 		return open(path).read()
 	return abort(404, 'File not found')
 
