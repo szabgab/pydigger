@@ -6,16 +6,18 @@
 
 <input type="hidden" id="package_name" value="{{name}}" />
 
-<select id="version_selector" name="idx">
-  <option value="">Select Verion</option>
-% for i in range(0, len(pkgs)):
-%   if i != idx:
-       <option value="{{pkgs[i]['version']}}">{{pkgs[i]['version']}} at {{pkgs[i]['upload_time'] if 'upload_time' in pkgs[i] else  ''}}</option>
+% if len(pkgs) > 1:
+  <select id="version_selector" name="idx">
+    <option value="">Select Verion</option>
+%   for i in range(0, len(pkgs)):
+%     if i != idx:
+         <option value="{{pkgs[i]['version']}}">{{pkgs[i]['version']}} at {{pkgs[i]['upload_time'] if 'upload_time' in pkgs[i] else  ''}}</option>
+%     end
 %   end
+  </select><br>
+  <button id="jump_to">Jump to</button>
+  <!-- <button id="diff_with">Diff with</button> -->
 % end
-</select><br>
-<button id="jump_to">Jump to</button>
-<!-- <button id="diff_with">Diff with</button> -->
 
 <h2>Files</h2>
 <ul>
