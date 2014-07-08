@@ -150,7 +150,7 @@ class PyDigger(object):
 		out_path = os.path.dirname(out_file)
 		if os.path.exists(out_file):
 			return
-		print("LOG: syntax highlighting {}".format(path))
+		#print("LOG: syntax highlighting {}".format(path))
 
 		fh = open(path)
 		code = fh.read()
@@ -160,7 +160,7 @@ class PyDigger(object):
 		used_lexer = guessed_lexer
 		if file[-3:] == '.py':
 			used_lexer = pygments.lexers.PythonLexer()
-		print("LOG: File {} Guessed Lexer: {} Used Lexer: {}".format(file, guessed_lexer, used_lexer))
+		#print("LOG: File {} Guessed Lexer: {} Used Lexer: {}".format(file, guessed_lexer, used_lexer))
 
 
 		# Some lexers:
@@ -185,7 +185,7 @@ class PyDigger(object):
 			html = 'Timeout'
 			print('ERROR: Timeout when running syntax highlighting for {}'.format(file))
 		end   = time.time()
-		print("LOG. Syntaxt highlighting {} ellapsed time: {}".format(file, end - start))
+		print("LOG: Syntaxt highlighting {} with lexer: {} ellapsed time: {}".format(file, used_lexer, end - start))
 		if not os.path.exists(out_path):
 			os.makedirs(out_path)
 		fh = open(out_file, 'w')
