@@ -98,8 +98,7 @@ def package(name, version=''):
 	else:
 		return abort(404, 'No such package found')
 
-@app.route('/search/json')
-def search_json():
+def _search():
 	q = {}
 	status = request.query.get('status')
 	if status:
@@ -108,19 +107,21 @@ def search_json():
 	package = request.query.get('package')
 	if package:
 		q['package'] = re.compile(package, re.IGNORECASE)
-	#return q
+	return q
+
+@app.route('/search/json')
+def search_json():
+	q = _search()
+
 	pkgs = set([]) 
 	for p in packages.find(q):
 		pkgs.add(p['package'])
 	#return json.dumps(['abc', 'def'])
 	return json.dumps(list(pkgs))
 	
-
 @app.route('/search')
-def search():
-	q = {}
-	q['status'] = request.query.get('status')
-	#return(q)
+def search_list():
+	q = _search()
 	return mytemplate('list.tpl', pkgs=packages.find(q))
 
 @app.route('/stats')

@@ -18,7 +18,10 @@
 | <a href="/about">About</a>
 | <a href="/stats">Stats</a>
 </div>
-<input id="search" />
+
+<form id="search_form" action="/search">
+<input id="search" name="package" />
+</form>
 
 <div id="page">
 
