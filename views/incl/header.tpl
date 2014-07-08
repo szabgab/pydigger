@@ -21,6 +21,7 @@
 
 <form id="search_form" action="/search">
 <input id="search" name="package" />
+<input type="submit" value="Search" />
 </form>
 
 <div id="page">

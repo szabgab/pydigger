@@ -19,7 +19,7 @@ def mytemplate(file, **args):
 
 @app.route('/')
 def index():
-	return mytemplate('list.tpl', pkgs=packages.find())
+	return mytemplate('main.tpl')
 
 @app.route('/packages/<path:path>')
 def source(path):
