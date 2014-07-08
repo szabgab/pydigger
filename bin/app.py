@@ -107,22 +107,21 @@ def _search():
 	package = request.query.get('package')
 	if package:
 		q['package'] = re.compile(package, re.IGNORECASE)
-	return q
-
-@app.route('/search/json')
-def search_json():
-	q = _search()
 
 	pkgs = set([]) 
 	for p in packages.find(q):
 		pkgs.add(p['package'])
-	#return json.dumps(['abc', 'def'])
-	return json.dumps(list(pkgs))
+	return list(pkgs)
+
+@app.route('/search/json')
+def search_json():
+	pkgs = _search()
+	return json.dumps(pkgs)
 	
 @app.route('/search')
 def search_list():
-	q = _search()
-	return mytemplate('list.tpl', pkgs=packages.find(q))
+	pkgs = _search()
+	return mytemplate('list.tpl', pkgs=pkgs)
 
 @app.route('/stats')
 def stats():
