@@ -143,8 +143,13 @@ def stats():
 def about():
 	return mytemplate('about.tpl')
 
-if len(sys.argv) > 1 and sys.argv[1] == 'paste':
-	app.run(host='localhost', port=8080, server='paste')
+if len(sys.argv) > 1:
+	if sys.argv[1] == 'paste':
+		app.run(host='localhost', port=8080, server='paste')
+	elif sys.argv[1] == 'default':
+		app.run(host='localhost', port=8080)
+else:
+	app.run(host='localhost', port=8080, reloader=True, debug=True)
 else:
 	app.run(host='localhost', port=8080, reloader=True, debug=True)
 
