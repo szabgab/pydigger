@@ -150,6 +150,4 @@ if len(sys.argv) > 1:
 		app.run(host='localhost', port=8080)
 else:
 	app.run(host='localhost', port=8080, reloader=True, debug=True)
-else:
-	app.run(host='localhost', port=8080, reloader=True, debug=True)
 
