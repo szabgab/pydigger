@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import pymongo
-import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, time
+import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, time, argparse
 from datetime import datetime
 import logging
 
@@ -21,12 +21,15 @@ def timeout_handler(signum, frame):
 
 class PyDigger(object):
 	def __init__(self):
+		parser = argparse.ArgumentParser()
+		parser.add_argument('--rss', help='process PyPi RSS feed', action='store_true')
+		self.args = parser.parse_args()
+
 		logdir = 'log'
 		if not os.path.exists(logdir):
 		  os.makedirs(logdir)
 		logfile_name = '{}/pydigger-{}.log'.format(logdir, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
 		logging.basicConfig(filename= logfile_name, level= logging.DEBUG)
-		logging.info("Start")
 
 	def find_or_create_pkg_info(self, link):
 		#link   # http://pypi.python.org/pypi/getvps/0.1
@@ -266,12 +269,15 @@ class PyDigger(object):
 
 	# collect information about the package (list of files)
 	def run(self):
+
 		start = time.time()
+		logging.info("Start at {}".format(start))
 		if not self.connect_to_mondodb():
 			return
 
-		self.parse_feed()
-		self.save_last_updates()
+		if self.args.rss:
+			self.parse_feed()
+			self.save_last_updates()
 
 		end   = time.time()
 
