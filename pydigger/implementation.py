@@ -219,21 +219,7 @@ class PyDigger(object):
 			logging.fatal("Could not connect to MongoDB. Exiting")
 			return False
 
-
-	# fetch the rss feed
-	# list the most recent package names and version numbers
-	# fetch the json file of each package
-    # http://pypi.python.org/pypi/<package_name>/<version>/json
-	# add information to a database
-	# download each package
-	# unzip them
-
-	# collect information about the package (list of files)
-	def run(self):
-		start = time.time()
-		if not self.connect_to_mondodb():
-			return
-
+	def parse_feed(self):
 		try:
 			w = urllib2.urlopen(rss_feed)
 			rss = w.read()
@@ -260,6 +246,22 @@ class PyDigger(object):
 			if 'files' in self.data:
 				for f in self.data['files']:
 					self.highlight(f)
+
+	# fetch the rss feed
+	# list the most recent package names and version numbers
+	# fetch the json file of each package
+    # http://pypi.python.org/pypi/<package_name>/<version>/json
+	# add information to a database
+	# download each package
+	# unzip them
+
+	# collect information about the package (list of files)
+	def run(self):
+		start = time.time()
+		if not self.connect_to_mondodb():
+			return
+
+		self.parse_feed()
 
 		last_update = self.meta.find_one({ 'name' : 'last_update' })
 		if not last_update:
