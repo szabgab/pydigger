@@ -247,6 +247,15 @@ class PyDigger(object):
 				for f in self.data['files']:
 					self.highlight(f)
 
+	def save_last_updates(self):
+		last_update = self.meta.find_one({ 'name' : 'last_update' })
+		if not last_update:
+			self.meta.insert({ 'name' : 'last_update' })
+			last_update = self.meta.find_one({ 'name' : 'last_update' })
+
+		last_update['value'] = datetime.utcnow()
+		self.meta.save(last_update)
+
 	# fetch the rss feed
 	# list the most recent package names and version numbers
 	# fetch the json file of each package
@@ -262,14 +271,7 @@ class PyDigger(object):
 			return
 
 		self.parse_feed()
-
-		last_update = self.meta.find_one({ 'name' : 'last_update' })
-		if not last_update:
-			self.meta.insert({ 'name' : 'last_update' })
-			last_update = self.meta.find_one({ 'name' : 'last_update' })
-
-		last_update['value'] = datetime.utcnow()
-		self.meta.save(last_update)
+		self.save_last_updates()
 
 		end   = time.time()
 
