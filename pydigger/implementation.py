@@ -21,9 +21,9 @@ def timeout_handler(signum, frame):
 
 class PyDigger(object):
 	def __init__(self):
-		parser = argparse.ArgumentParser()
-		parser.add_argument('--rss', help='process PyPi RSS feed', action='store_true')
-		self.args = parser.parse_args()
+		self.argparser = argparse.ArgumentParser()
+		self.argparser.add_argument('--rss', help='process PyPi RSS feed', action='store_true')
+		self.args = self.argparser.parse_args()
 
 		logdir = 'log'
 		if not os.path.exists(logdir):
@@ -278,6 +278,8 @@ class PyDigger(object):
 		if self.args.rss:
 			self.parse_feed()
 			self.save_last_updates()
+		else:
+			self.argparser.print_help()
 
 		end   = time.time()
 
