@@ -204,7 +204,7 @@ class PyDigger(object):
 			self.meta     = self.mongo_db.meta
 			return True
 		except pymongo.errors.ConnectionFailure:
-			print("ERROR: Could not connect to MongoDB. Exciting")
+			print("ERROR: Could not connect to MongoDB. Exiting")
 			return False
 
 
@@ -222,8 +222,13 @@ class PyDigger(object):
 		if not self.connect_to_mondodb():
 			return
 
-		w = urllib2.urlopen(rss_feed)
-		rss = w.read()
+		try:
+			w = urllib2.urlopen(rss_feed)
+			rss = w.read()
+		except urllib2.URLError:
+			print("ERROR: Could not fetch RSS feed from PyPi. Exiting.")
+			return
+		
 		feed = feedparser.parse( rss )
 		for v in feed['entries']:
 			if not self.find_or_create_pkg_info(v['link']):
