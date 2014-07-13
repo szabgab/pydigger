@@ -34,7 +34,7 @@ class PyDigger(object):
 		# http://pypi.python.org/pypi/<package>/<version>
 		match = re.search(r'http://pypi.python.org/pypi/([^/]+)/([^/]+)$', link)
 		if not match:
-			print("ERROR: url {} does not match the expected format".format(link))
+			logging.error("url {} does not match the expected format".format(link))
 			return False
 	
 		package = match.group(1)
@@ -47,12 +47,12 @@ class PyDigger(object):
 				'version' : version,
 				'status'  : 'waiting_for_zip_url'
 			}
-			print("LOG: adding package {} version {} to the database ".format(package, version))
+			logging.info("adding package {} version {} to the database ".format(package, version))
 			self.packages.insert(data)
 			data = self.packages.find_one({'package' : package, 'version' : version })
 	
 		if not data:
-			print("INERNAL ERROR: data just added and cannot be found? package {} version {}".format(package, version))
+			logging.fatal("data just added and cannot be found? package {} version {}".format(package, version))
 			return False
 
 		self.data = data
@@ -66,7 +66,7 @@ class PyDigger(object):
 		url = 'http://pypi.python.org/pypi/{}/{}/json'.format(self.data['package'], version)
 		w = urllib2.urlopen(url)
 		json_string = w.read()
-		#print("LOG: json_string: {}".format(json_string))
+		#logging.debug("json_string: {}".format(json_string))
 		package_info = json.loads(json_string)
 
 		# check if deep data structure exists with try/except
@@ -74,7 +74,7 @@ class PyDigger(object):
 			self.data['zip_url']     = package_info['releases'][version][0]['url']
 			self.data['upload_time'] = package_info['releases'][version][0]['upload_time']
 		except:
-			print("LOG: zip_url missing from json for package {} version {} try this url: {}".format(self.data['package'], self.data['version'], url))
+			logging.info("zip_url missing from json for package {} version {} try this url: {}".format(self.data['package'], self.data['version'], url))
 			return False
 
 		self.data['package_info'] = {}
@@ -82,7 +82,7 @@ class PyDigger(object):
 
 	
 		self.data['status']  = 'zip_url_found'
-		print("LOG: zip_url {} found in json".format(self.data['zip_url']))
+		logging.info("zip_url {} found in json".format(self.data['zip_url']))
 		self.packages.save(self.data)
 		return True
 
@@ -95,7 +95,7 @@ class PyDigger(object):
 		# remove the URL from the beginning of the zip_url and add it to the path to 'src_root'
 		m = re.search(r'^https://pypi.python.org/(.*)', self.data['zip_url'])
 		if not m:
-			print("ERROR: zip_url prefix does not match {}".format(self.data['zip_url']))
+			logging.error("zip_url prefix does not match {}".format(self.data['zip_url']))
 			self.data['status'] = 'error_unknown_zip_url_prefix'
 			self.packages.save(self.data)
 			return False
@@ -104,9 +104,9 @@ class PyDigger(object):
 		local_path = os.path.dirname(local_zip_file)
 		if not os.path.exists(local_zip_file):
 			if not os.path.exists(local_path):
-				print("LOG: creating dir {}".format(local_path))
+				logging.info("creating dir {}".format(local_path))
 				os.makedirs(local_path)
-			print("LOG: downloading {} to {}".format(self.data['zip_url'], local_zip_file))
+			logging.info("downloading {} to {}".format(self.data['zip_url'], local_zip_file))
 			urllib.urlretrieve(self.data['zip_url'], local_zip_file)
 	
 		m = re.search(r'(.*)(\.tar\.gz|\.zip)$', local_zip_file)
@@ -114,7 +114,7 @@ class PyDigger(object):
 			project_path = m.group(1)
 			extension    = m.group(2)
 			if not os.path.exists(project_path):
-				print("LOG: unzipping {} to {} using {}".format(local_zip_file, local_path, extension))
+				logging.info("unzipping {} to {} using {}".format(local_zip_file, local_path, extension))
 				if extension == '.tar.gz':
 					tar = tarfile.open(local_zip_file)
 					tar.extractall(path=local_path)
@@ -127,7 +127,7 @@ class PyDigger(object):
 					raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
 		else:
 			self.data['status'] = 'error_unknown_zip_file_type'
-			print("ERROR: unknown zip file type {}".format(local_zip_file))
+			logging.error("unknown zip file type {}".format(local_zip_file))
 			self.packages.save(self.data)
 			return False
 	
@@ -154,7 +154,7 @@ class PyDigger(object):
 		out_path = os.path.dirname(out_file)
 		if os.path.exists(out_file):
 			return
-		#print("LOG: syntax highlighting {}".format(path))
+		#logging.debug("syntax highlighting {}".format(path))
 
 		fh = open(path)
 		code = fh.read()
@@ -164,7 +164,7 @@ class PyDigger(object):
 		used_lexer = guessed_lexer
 		if file[-3:] == '.py':
 			used_lexer = pygments.lexers.PythonLexer()
-		#print("LOG: File {} Guessed Lexer: {} Used Lexer: {}".format(file, guessed_lexer, used_lexer))
+		#logging.debug("File {} Guessed Lexer: {} Used Lexer: {}".format(file, guessed_lexer, used_lexer))
 
 
 		# Some lexers:
@@ -187,9 +187,9 @@ class PyDigger(object):
 			html = pygments.highlight(code, used_lexer, pygments.formatters.html.HtmlFormatter())
 		except TimeoutException:
 			html = 'Timeout'
-			print('ERROR: Timeout when running syntax highlighting for {}'.format(file))
+			logging.error('Timeout when running syntax highlighting for {}'.format(file))
 		end   = time.time()
-		print("LOG: Syntaxt highlighting {} with lexer: {} ellapsed time: {}".format(file, used_lexer, end - start))
+		logging.info("Syntaxt highlighting {} with lexer: {} ellapsed time: {}".format(file, used_lexer, end - start))
 		if not os.path.exists(out_path):
 			os.makedirs(out_path)
 		fh = open(out_file, 'w')
@@ -211,7 +211,7 @@ class PyDigger(object):
 			self.meta     = self.mongo_db.meta
 			return True
 		except pymongo.errors.ConnectionFailure:
-			print("ERROR: Could not connect to MongoDB. Exiting")
+			logging.fatal("Could not connect to MongoDB. Exiting")
 			return False
 
 
@@ -233,7 +233,7 @@ class PyDigger(object):
 			w = urllib2.urlopen(rss_feed)
 			rss = w.read()
 		except urllib2.URLError:
-			print("ERROR: Could not fetch RSS feed from PyPi. Exiting.")
+			logging.error("Could not fetch RSS feed from PyPi. Exiting.")
 			return
 		
 		feed = feedparser.parse( rss )
@@ -266,5 +266,5 @@ class PyDigger(object):
 
 		end   = time.time()
 
-		print("LOG: DONE. Elapsed time: {}".format(end - start))
+		logging.info("DONE. Elapsed time: {}".format(end - start))
 
