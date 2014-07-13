@@ -64,8 +64,13 @@ class PyDigger(object):
 
 		version = self.data['version']
 		url = 'http://pypi.python.org/pypi/{}/{}/json'.format(self.data['package'], version)
-		w = urllib2.urlopen(url)
-		json_string = w.read()
+		try:
+			w = urllib2.urlopen(url)
+			json_string = w.read()
+		except Exception as (e):
+			logging.error("Could not fetch {}  {}".format(url, e))
+			return False
+
 		#logging.debug("json_string: {}".format(json_string))
 		package_info = json.loads(json_string)
 
