@@ -1,6 +1,5 @@
 from __future__ import print_function, division
 import pymongo
-from pymongo import MongoClient
 import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, datetime, time
 
 import signal
@@ -199,7 +198,7 @@ class PyDigger(object):
 
 	def connect_to_mondodb(self):
 		try:
-			self.mongo_client = MongoClient('localhost', 27017)
+			self.mongo_client = pymongo.MongoClient('localhost', 27017)
 			self.mongo_db = self.mongo_client.pydigger
 			self.packages = self.mongo_db.packages
 			self.meta     = self.mongo_db.meta
