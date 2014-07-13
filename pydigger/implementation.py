@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+import pymongo
 from pymongo import MongoClient
 import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, datetime, time
 
@@ -19,10 +20,7 @@ def timeout_handler(signum, frame):
 
 class PyDigger(object):
 	def __init__(self):
-		self.mongo_client = MongoClient('localhost', 27017)
-		self.mongo_db = self.mongo_client.pydigger
-		self.packages = self.mongo_db.packages
-		self.meta     = self.mongo_db.meta
+		pass
 
 	def find_or_create_pkg_info(self, link):
 		#link   # http://pypi.python.org/pypi/getvps/0.1
@@ -199,6 +197,17 @@ class PyDigger(object):
 		}
 
 
+	def connect_to_mondodb(self):
+		try:
+			self.mongo_client = MongoClient('localhost', 27017)
+			self.mongo_db = self.mongo_client.pydigger
+			self.packages = self.mongo_db.packages
+			self.meta     = self.mongo_db.meta
+			return True
+		except pymongo.errors.ConnectionFailure:
+			print("ERROR: Could not connect to MongoDB. Exciting")
+			return False
+
 
 	# fetch the rss feed
 	# list the most recent package names and version numbers
@@ -211,6 +220,9 @@ class PyDigger(object):
 	# collect information about the package (list of files)
 	def run(self):
 		start = time.time()
+		if not self.connect_to_mondodb():
+			return
+
 		w = urllib2.urlopen(rss_feed)
 		rss = w.read()
 		feed = feedparser.parse( rss )
