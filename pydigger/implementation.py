@@ -23,6 +23,7 @@ class PyDigger(object):
 	def __init__(self):
 		self.argparser = argparse.ArgumentParser()
 		self.argparser.add_argument('--rss', help='process PyPi RSS feed', action='store_true')
+		self.argparser.add_argument('--reprocess', help='process data already in database', action='store_true')
 		self.args = self.argparser.parse_args()
 
 		logdir = 'log'
@@ -259,6 +260,12 @@ class PyDigger(object):
 		last_update['value'] = datetime.utcnow()
 		self.meta.save(last_update)
 
+
+	def reprocess(self):
+		for p in self.packages.find():
+			print(p['package'])
+			print(p['status'])  # package # version # files
+
 	# fetch the rss feed
 	# list the most recent package names and version numbers
 	# fetch the json file of each package
@@ -278,6 +285,8 @@ class PyDigger(object):
 		if self.args.rss:
 			self.parse_feed()
 			self.save_last_updates()
+		elif self.args.reprocess:
+			self.reprocess()
 		else:
 			self.argparser.print_help()
 
