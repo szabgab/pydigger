@@ -1,6 +1,8 @@
 from __future__ import print_function, division
 import pymongo
-import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, datetime, time
+import urllib, urllib2, feedparser, re, json, os, tarfile, zipfile, time
+from datetime import datetime
+import logging
 
 import signal
 import pygments
@@ -19,7 +21,12 @@ def timeout_handler(signum, frame):
 
 class PyDigger(object):
 	def __init__(self):
-		pass
+		logdir = 'log'
+		if not os.path.exists(logdir):
+		  os.makedirs(logdir)
+		logfile_name = '{}/pydigger-{}.log'.format(logdir, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
+		logging.basicConfig(filename= logfile_name, level= logging.DEBUG)
+		logging.info("Start")
 
 	def find_or_create_pkg_info(self, link):
 		#link   # http://pypi.python.org/pypi/getvps/0.1
@@ -254,7 +261,7 @@ class PyDigger(object):
 			self.meta.insert({ 'name' : 'last_update' })
 			last_update = self.meta.find_one({ 'name' : 'last_update' })
 
-		last_update['value'] = datetime.datetime.utcnow()
+		last_update['value'] = datetime.utcnow()
 		self.meta.save(last_update)
 
 		end   = time.time()
