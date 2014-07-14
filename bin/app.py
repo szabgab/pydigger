@@ -3,6 +3,9 @@ from bottle import Bottle, template, abort, TEMPLATE_PATH, response, request, re
 from pymongo import MongoClient
 import os,sys,re,json
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import pydigger
+
 mongo_client = MongoClient('localhost', 27017)
 mongo_db = mongo_client.pydigger
 packages = mongo_db.packages
@@ -127,13 +130,7 @@ def search_list():
 def stats():
 	pkg_count=packages.find().count()
 	st = {}
-	statuses = [
-		'waiting_for_zip_url',
-		'error_unknown_zip_file_type',
-		'error_unknown_zip_url_prefix',
-		'zip_url_found'
-	]
-	for s in statuses:
+	for s in pydigger.get_statuses():
 		st[s] = packages.find({'status' : s}).count()
 
 	return mytemplate('stats.tpl', pkg_count=pkg_count, statuses=st)
