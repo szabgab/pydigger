@@ -198,6 +198,7 @@ class PyDigger(object):
 		except TimeoutException:
 			html = 'Timeout'
 			logging.error('Timeout when running syntax highlighting for {}'.format(file))
+		signal.alarm(0)
 		end   = time.time()
 		logging.info("Syntaxt highlighting {} with lexer: {} ellapsed time: {}".format(file, used_lexer, end - start))
 		if not os.path.exists(out_path):
