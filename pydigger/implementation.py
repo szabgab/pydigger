@@ -31,6 +31,7 @@ class PyDigger(object):
 		  os.makedirs(logdir)
 		logfile_name = '{}/pydigger-{}.log'.format(logdir, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
 		logging.basicConfig(filename= logfile_name, level= logging.DEBUG)
+		print("LOG filename: {}".format(logfile_name))
 
 	def find_or_create_pkg_info(self, link):
 		#link   # http://pypi.python.org/pypi/getvps/0.1
