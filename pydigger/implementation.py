@@ -12,7 +12,7 @@ import pygments.formatters
 src_root = 'www'
 html_root = 'html'
 rss_feed = 'https://pypi.python.org/pypi?%3Aaction=rss'
-FILE_SIZE_LIMIT = 100000 # ~ 100 KB 
+FILE_SIZE_LIMIT = 200000 # ~ 200 KB
 
 class TimeoutException(Exception):
     pass
