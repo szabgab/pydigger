@@ -103,14 +103,21 @@ class PyDigger(object):
 			return False
 
 		# remove the URL from the beginning of the zip_url and add it to the path to 'src_root'
-		m = re.search(r'^https://pypi.python.org/(.*)', self.data['zip_url'])
-		if not m:
+		prefix_match = re.search(r'^https://pypi.python.org/(.*)', self.data['zip_url'])
+		if not prefix_match:
 			logging.error("zip_url prefix does not match {}".format(self.data['zip_url']))
 			self.data['status'] = 'error_unknown_zip_url_prefix'
 			self.packages.save(self.data)
 			return False
 	
-		local_zip_file = src_root + '/' + m.group(1)
+		local_zip_file = src_root + '/' + prefix_match.group(1)
+		extension_match = re.search(r'(.*)(\.tar\.gz|\.zip)$', local_zip_file)
+		if not extension_match:
+			self.data['status'] = 'error_unknown_zip_file_type'
+			logging.error("unknown zip file type {}".format(local_zip_file))
+			self.packages.save(self.data)
+			return False
+
 		local_path = os.path.dirname(local_zip_file)
 		if not os.path.exists(local_zip_file):
 			if not os.path.exists(local_path):
@@ -119,27 +126,21 @@ class PyDigger(object):
 			logging.info("downloading {} to {}".format(self.data['zip_url'], local_zip_file))
 			urllib.urlretrieve(self.data['zip_url'], local_zip_file)
 	
-		m = re.search(r'(.*)(\.tar\.gz|\.zip)$', local_zip_file)
-		if m:
-			project_path = m.group(1)
-			extension    = m.group(2)
-			if not os.path.exists(project_path):
-				logging.info("unzipping {} to {} using {}".format(local_zip_file, local_path, extension))
-				if extension == '.tar.gz':
-					tar = tarfile.open(local_zip_file)
-					tar.extractall(path=local_path)
-					tar.close()
-				elif extension == '.zip':
-					tar = zipfile.ZipFile(local_zip_file)
-					tar.extractall(path=local_path)
-					tar.close()
-				else:
-					raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
-		else:
-			self.data['status'] = 'error_unknown_zip_file_type'
-			logging.error("unknown zip file type {}".format(local_zip_file))
-			self.packages.save(self.data)
-			return False
+		# unzip file
+		project_path = extension_match.group(1)
+		extension    = extension_match.group(2)
+		if not os.path.exists(project_path):
+			logging.info("unzipping {} to {} using {}".format(local_zip_file, local_path, extension))
+			if extension == '.tar.gz':
+				tar = tarfile.open(local_zip_file)
+				tar.extractall(path=local_path)
+				tar.close()
+			elif extension == '.zip':
+				tar = zipfile.ZipFile(local_zip_file)
+				tar.extractall(path=local_path)
+				tar.close()
+			else:
+				raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
 	
 		# list all the files in the project_path and add it to the database
 		if 'files' not in self.data:
