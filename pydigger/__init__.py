@@ -4,6 +4,7 @@ statuses = (
 	('error_unknown_zip_file_type',  'The zip file listed in the JSON file is in a format PyDigger does not handle yet. Currently supported formats are .zip and .tag.gz.'),
 	('zip_url_found',                'A zip URL found in the JSON file. (Currently this is the final state as well.)'),
 	('error_unknown_zip_url_prefix', 'Sanity check that the zip file is being donwloaded from https://pypi.python.org/'),
+	('zip_file_downloaded',          'The zip file has been successfully downloaded.'),
 )
 def get_statuses():
 	return [s[0] for s in statuses]

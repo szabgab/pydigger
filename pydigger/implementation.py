@@ -101,6 +101,9 @@ class PyDigger(object):
 			return False
 		if self.data['status'] == 'error_unknown_zip_file_type':
 			return False
+		if self.data['status'] == 'zip_file_downloaded':
+			return True 
+		
 
 		# remove the URL from the beginning of the zip_url and add it to the path to 'src_root'
 		prefix_match = re.search(r'^https://pypi.python.org/(.*)', self.data['zip_url'])
@@ -125,6 +128,9 @@ class PyDigger(object):
 				os.makedirs(local_path)
 			logging.info("downloading {} to {}".format(self.data['zip_url'], local_zip_file))
 			urllib.urlretrieve(self.data['zip_url'], local_zip_file)
+
+			self.data['status'] = 'zip_file_downloaded'
+			self.packages.save(self.data)
 	
 		# unzip file
 		project_path = extension_match.group(1)
@@ -141,6 +147,9 @@ class PyDigger(object):
 				tar.close()
 			else:
 				raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
+
+		logging.info("removing '{}'".format(local_zip_file));
+		os.remove(local_zip_file)
 	
 		# list all the files in the project_path and add it to the database
 		if 'files' not in self.data:
