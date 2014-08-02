@@ -12,6 +12,7 @@ import pygments.formatters
 src_root = 'www'
 html_root = 'html'
 rss_feed = 'https://pypi.python.org/pypi?%3Aaction=rss'
+FILE_SIZE_LIMIT = 100000 # ~ 100 KB 
 
 class TimeoutException(Exception):
     pass
@@ -90,7 +91,6 @@ class PyDigger(object):
 		self.data['package_info'] = {}
 		self.data['package_info']['info'] = package_info['info']
 
-	
 		self.data['status']  = 'zip_url_found'
 		logging.info("zip_url {} found in json".format(self.data['zip_url']))
 		self.packages.save(self.data)
@@ -148,7 +148,7 @@ class PyDigger(object):
 			else:
 				raise(Exception('Internal error. Unknown extension: {}'.format(extension)))
 
-		logging.info("removing '{}'".format(local_zip_file));
+		logging.info("removing zip file '{}'".format(local_zip_file));
 		os.remove(local_zip_file)
 	
 		# list all the files in the project_path and add it to the database
@@ -160,6 +160,12 @@ class PyDigger(object):
 				for filename in filenames:
 					file_path = os.path.join(dirname, filename)[len(project_path)+1:]
 					self.data['files'].append(file_path)
+					path = src_root + '/' + self.data['project_path'] + '/' + file_path
+					size = os.stat(path).st_size
+					if (size > FILE_SIZE_LIMIT):
+						logging.info("removing file '{}' as its size is {} > {}".format(path, size, FILE_SIZE_LIMIT));
+						os.remove(path)
+
 			self.packages.save(self.data)
 		return True
 
