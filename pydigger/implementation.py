@@ -178,6 +178,8 @@ class PyDigger(object):
 		path = src_root + '/' + self.data['project_path'] + '/' + file
 		out_file = html_root + '/' + self.data['project_path'] + '/' + file
 		out_path = os.path.dirname(out_file)
+		if not os.path.exists(path): # probably as it was too large?
+			return
 		if os.path.exists(out_file):
 			return
 		#logging.debug("syntax highlighting {}".format(path))
