@@ -12,7 +12,7 @@ import pygments.formatters
 src_root = 'www'
 html_root = 'html'
 rss_feed = 'https://pypi.python.org/pypi?%3Aaction=rss'
-FILE_SIZE_LIMIT = 200000 # ~ 200 KB
+FILE_SIZE_LIMIT = 100000 # ~ 100 KB
 
 class TimeoutException(Exception):
     pass
@@ -219,11 +219,15 @@ class PyDigger(object):
 		signal.alarm(0)
 		end   = time.time()
 		logging.info("Syntaxt highlighting {} with lexer: {} ellapsed time: {}".format(file, used_lexer, end - start))
-		if not os.path.exists(out_path):
-			os.makedirs(out_path)
-		fh = open(out_file, 'w')
-		fh.write(html.encode('utf8'))
-		fh.close()
+		size = len(html.encode('utf8'))
+		if (size > FILE_SIZE_LIMIT):
+			logging.info("not saving file '{}' as its size is {} > {}".format(out_path, size, FILE_SIZE_LIMIT));
+		else:
+			if not os.path.exists(out_path):
+				os.makedirs(out_path)
+			fh = open(out_file, 'w')
+			fh.write(html.encode('utf8'))
+			fh.close()
 
 		return {
 			'guessed_lexer' : guessed_lexer,
